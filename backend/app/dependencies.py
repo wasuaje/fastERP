@@ -9,8 +9,9 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from .schemas.auth import UserInDB, TokenData, User
 from .crud.auth import get_usernames
+import os
 
-SECRET_KEY = "c67ab803e6f576001907a27a3d85e53f5efb413c665755aa2e812215a9582982"
+SECRET_KEY = os.getenv("FASTAPI_SECRET_KEY")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
