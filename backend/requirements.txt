@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+sqlalchemy==1.3.20
+mysqlclient
+python-multipart
+passlib
+python-jose[cryptography]
+passlib[bcrypt]
+bcrypt

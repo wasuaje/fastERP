@@ -1,0 +1,22 @@
+#!/bin/bash
+
+mysql_ready() {
+        mysqladmin ping --host=mysql-server --user=root --password=MYSQL_ROOT_PASSWORD > /dev/null 2>&1
+    }
+
+while !(mysql_ready)
+do
+   sleep 5
+   echo "waiting for mysql to continue..."
+done
+echo "copying data"
+mysql --host=mysql-server --user=${mysql_user} --password=${mysql_pass} mydb  < backend/initial_value.sql
+# pip install --upgrade pip
+# pip install -r requirements.txt
+# python manage.py collectstatic --no-input --settings=project.settings_dev
+# python manage.py showmigrations --settings=project.settings_dev
+# python manage.py initadmin --settings=project.settings_dev
+# python manage.py runserver 0.0.0.0:8000 --settings=project.settings_dev
+# $(ip a | grep -oE "\b([0-9]{1,3}\.){3}[0-9]{1,3}\b" | grep 172.18 | head -1):8090 #test
+# uwsgi --ini conf.ini
+uvicorn backend.app.main:app --host 0.0.0.0 --reload

@@ -1,0 +1,14 @@
+#!/bin/bash
+
+mysql_ready() {
+        mysqladmin ping --host=mysql-server --user=root --password=MYSQL_ROOT_PASSWORD > /dev/null 2>&1
+    }
+
+while !(mysql_ready)
+do
+   sleep 5
+   echo "waiting for mysql to continue..."
+done
+echo "copying data"
+
+uvicorn backend.app.main:app --host 0.0.0.0 --port 8000

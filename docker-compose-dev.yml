@@ -1,0 +1,53 @@
+version: "3.3"
+services:
+  mysql-server:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    cap_add:
+      - SYS_NICE
+    ports:
+      - "3306:3306"
+      - "33060:33060"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${mysql_root_pass}
+      MYSQL_DATABASE: mydb
+      MYSQL_USER: ${mysql_user}
+      MYSQL_PASSWORD: ${mysql_pass}
+  backend:
+    build: ./backend/dev/
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    environment:
+      mysql_user: ${mysql_user}
+      mysql_pass: ${mysql_pass}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN}
+      TWILIO_SID: ${TWILIO_SID}
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    depends_on:
+      - mysql-server
+    command: ["./backend/start_back-dev"]
+  frontend:
+    build:
+      context: ./frontend/
+      dockerfile: Dockerfile
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - REACT_APP_PUBLIC_API_URL=http://localhost:8000
+    ports:
+      - "3000:3000"
+    volumes:
+      - './frontend:/frontend'
+      - '/frontend/node_modules'
+    depends_on:
+      - mysql-server
+      - backend

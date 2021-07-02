@@ -1,0 +1,10 @@
+*node_modules*
+/static
+mydatabase
+output
+*.pyc
+/static-files
+.coverage$
+*.deleted$
+*__pycache__*
+*.sql
