@@ -22,7 +22,7 @@ import { ref } from 'yup';
         const result = await axios({
             method: method,
             // headers: { Authorization: `Token ${Cookies.get("access_token")}` },
-            headers: { Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ3YXN1YWplIiwiZXhwIjoxNjI1MDkyMzkzfQ.wfWAKDtQjaWRhmMul7MQq5U82A_IK2nbh-xUkWVixok`},
+            headers: { Authorization: `Bearer MYTOKEN`},
             url: `${base_url}/api/${uri}`,
             data: payload,
         })
