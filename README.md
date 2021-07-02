@@ -1,6 +1,6 @@
-== fastERP ==
-Small ERP
+# == fastERP ==
+## Small ERP
 
-Backend: fastApi (python 3)
-FrontEnd: ReactJS
-Nginx for Static content
+## Backend: fastApi (python 3)
+## FrontEnd: ReactJS
+## Nginx for Static content
