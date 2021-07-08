@@ -1,16 +1,17 @@
 from fastapi import APIRouter, Depends, HTTPException
 from typing import List
 from sqlalchemy.orm import Session
-from ..dependencies import get_current_active_user, get_db
+from ..dependencies import get_current_active_user, get_db, get_user_permissions
 from ..schemas.invoice import Invoice, InvoiceCreate, InvoiceDelete, InvoiceResponse
 from ..schemas.auth import User
 from ..crud.invoice import get_invoicees, create_invoice
 from ..crud.invoice import get_invoice, delete_invoice, update_invoice
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(get_current_active_user),
+                                 Depends(get_user_permissions)])
 
 #
-# Caja - CASH
+# Facturacion - Invoice
 #
 @router.get("/api/invoice/", response_model=List[InvoiceResponse], tags=["Invoice"])
 def list_invoice(skip: int = 0, limit: int = 100,

@@ -1,11 +1,12 @@
 import React,  { useEffect, useState }  from 'react';
 import PropTypes from 'prop-types';
-import { createMuiTheme, ThemeProvider, withStyles } from '@material-ui/core/styles';
+import {ThemeProvider, withStyles } from '@material-ui/core/styles';
+import { unstable_createMuiStrictModeTheme as createMuiTheme } from '@material-ui/core';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Hidden from '@material-ui/core/Hidden';
 import Typography from '@material-ui/core/Typography';
 import Link from '@material-ui/core/Link';
-import WithMaterialUI from './FormTest';
+import WithMaterialUI from '../FormTest';
 import PeopleIcon from '@material-ui/icons/People';
 import DnsRoundedIcon from '@material-ui/icons/DnsRounded';
 import PermMediaOutlinedIcon from '@material-ui/icons/PhotoSizeSelectActual';
@@ -17,9 +18,9 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import PhonelinkSetupIcon from '@material-ui/icons/PhonelinkSetup';
 
 import Navigator from './Navigator';
-import Content from './Content';
+import Content from '../Content';
 import Header from './Header';
-import ClientTable from './ClientTable';
+import ClientTable from '../Client/ClientTable';
 
 
 function Copyright() {
@@ -174,7 +175,7 @@ const styles = {
   },
 };
 
-function Paperbase(props) {
+function Main(props) {
   const { classes } = props;
   const [mobileOpen, setMobileOpen] = useState(false);
   const [ContentComponent, setContentComponent] = useState(<WithMaterialUI /> );
@@ -273,8 +274,8 @@ function Paperbase(props) {
   );
 }
 
-Paperbase.propTypes = {
+Main.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)(Paperbase);
+export default withStyles(styles)(Main);

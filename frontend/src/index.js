@@ -3,11 +3,11 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import Paperbase from './screens/Paperbase'
+import Main from './screens/Main/Main'
 
 ReactDOM.render(
   <React.StrictMode>
-    <Paperbase />
+    <Main />
   </React.StrictMode>,
   document.getElementById('root')
 );

@@ -1,18 +1,16 @@
-
 from fastapi import APIRouter, Depends, HTTPException, status
 from typing import List
 from sqlalchemy.orm import Session
 from ..dependencies import get_current_active_user, get_db
 from ..dependencies import ACCESS_TOKEN_EXPIRE_MINUTES
 from ..dependencies import authenticate_user, create_access_token
-from ..schemas.auth import User, UserDetailUpdate, Token
+from ..schemas.auth import User, UserDetailUpdate, Token, UserCreate, UserDelete
 from datetime import datetime, timedelta
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from ..crud.auth import get_users, get_user, update_user
+from ..crud.auth import get_users, get_user, update_user, create_user, delete_user
 
 
 router = APIRouter()
-
 
 #
 # Usuario - User
@@ -23,6 +21,11 @@ def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db),
     cash = get_users(db, skip=skip, limit=limit)
     return cash
 
+@router.post("/api/user/", response_model=User,
+             tags=["Auth"])
+def create_users(user: UserCreate,
+                 db: Session = Depends(get_db)):
+    return create_user(db=db, user=user)
 
 @router.get("/api/user/{user_id}", response_model=User, tags=["Auth"])
 def read_user(user_id: int, db: Session = Depends(get_db),
@@ -31,7 +34,6 @@ def read_user(user_id: int, db: Session = Depends(get_db),
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
     return db_user
-
 
 @router.patch("/api/user/", response_model=User, tags=["Auth"])
 def update_users(user: UserDetailUpdate,
@@ -43,7 +45,23 @@ def update_users(user: UserDetailUpdate,
     return db_user
 
 
-@router.post("/token", response_model=Token, tags=["Auth"])
+@router.delete("/api/user/",
+               response_model=UserDelete,
+               tags=["Auth"])
+def delete_users(user: UserDelete,
+                 db: Session = Depends(get_db),
+                 current_user: User = Depends(
+                    get_current_active_user)):
+    db_user = delete_user(db, user)
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return db_user
+
+
+
+@router.post("/token", response_model=Token,
+             tags=["Auth"],
+             dependencies=[])             
 async def login_for_access_token(
         form_data: OAuth2PasswordRequestForm = Depends()):
     user = authenticate_user(form_data.username, form_data.password)

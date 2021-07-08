@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from typing import List
 from sqlalchemy.orm import Session
-from ..dependencies import get_current_active_user, get_db
+from ..dependencies import get_current_active_user, get_db, get_user_permissions
 from ..schemas.speciality import Speciality as SpecialitySchema
 from ..schemas.speciality import SpecialityQuickUpdate, SpecialityResponse
 from ..schemas.speciality import SpecialityDelete
@@ -9,7 +9,8 @@ from ..schemas.auth import User
 from ..crud.speciality import get_specialitys, create_speciality, get_speciality
 from ..crud.speciality import delete_speciality, update_speciality
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(get_current_active_user),
+                                 Depends(get_user_permissions)])
 
 #
 # Speciality

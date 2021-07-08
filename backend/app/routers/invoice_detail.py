@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from typing import List
 from sqlalchemy.orm import Session
-from ..dependencies import get_current_active_user, get_db
+from ..dependencies import get_current_active_user, get_db, get_user_permissions
 from ..schemas.invoice_detail import InvoiceDetail, InvoiceDetailResponse
 from ..schemas.invoice_detail import InvoiceDetailDelete, InvoiceDetailCreate
 from ..schemas.auth import User
@@ -10,7 +10,8 @@ from ..crud.invoice_detail import delete_invoice_detail, update_invoice_detail
 from ..crud.invoice_detail import get_invoice_detail
 
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(get_current_active_user),
+                                 Depends(get_user_permissions)])
 
 #
 # CAjaDetalle - InvoiceDetail

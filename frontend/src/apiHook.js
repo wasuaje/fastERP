@@ -12,6 +12,7 @@ import { ref } from 'yup';
   const [url, setUrl] = useState(base_url+uri);
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
+  const [errorMsg, setErrorMsg] = useState(false);
  
   useEffect(() => {
     const fetchData = async () => {
@@ -22,24 +23,25 @@ import { ref } from 'yup';
         const result = await axios({
             method: method,
             // headers: { Authorization: `Token ${Cookies.get("access_token")}` },
-            headers: { Authorization: `Bearer MYTOKEN`},
+            headers: { Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ3YXN1YWplIiwiZXhwIjoxNjI1NjEzNTUwfQ.FzlvhRu8GMzYABs9xe1hn-x8Sn4I1m4tdANZZBPvaQ0`},
             url: `${base_url}/api/${uri}`,
             data: payload,
         })
         // console.log(result.data)
- 
+         
         setData(result.data);
       } catch (error) {
         setIsError(true);
+        setErrorMsg(error)
       }
  
       setIsLoading(false);
     };
  
     fetchData();
-  }, [refresh,payload]);
+  }, [refresh,payload]); // Those ARE connectec
  
-  return [{ data, isLoading, isError }, setRefresh, setPayload];
+  return [ data, isLoading, isError, errorMsg , setRefresh, setPayload]; //THOSE are connected
 };
 
 export default useDataApi;

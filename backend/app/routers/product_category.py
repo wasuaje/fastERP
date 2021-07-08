@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from typing import List
 from sqlalchemy.orm import Session
-from ..dependencies import get_current_active_user, get_db
+from ..dependencies import get_current_active_user, get_db, get_user_permissions
 from ..schemas.product_category import ProductCategory as ProductCategorySchema, ProductCategoryQuickCreate
 from ..schemas.product_category import ProductCategoryQuickUpdate, ProductCategoryResponse
 from ..schemas.product_category import ProductCategoryDelete
@@ -10,7 +10,8 @@ from ..crud.product_category import get_product_categorys, create_product_catego
 from ..crud.product_category import update_product_category, get_product_category
 from ..crud.product_category import delete_product_category
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(get_current_active_user),
+                                 Depends(get_user_permissions)])
 
 #
 # ProductCategory

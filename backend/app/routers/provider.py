@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from typing import List
 from sqlalchemy.orm import Session
-from ..dependencies import get_current_active_user, get_db
+from ..dependencies import get_current_active_user, get_db, get_user_permissions
 from ..schemas.provider import Provider as ProviderSchema, ProviderQuickCreate
 from ..schemas.provider import ProviderQuickUpdate, ProviderResponse, ProviderDelete
 from ..schemas.auth import User
@@ -9,7 +9,8 @@ from ..crud.provider import get_providers, create_provider, update_provider, get
 from ..crud.provider import quick_create_provider, quick_update_provider
 from ..crud.provider import delete_provider
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(get_current_active_user),
+                                 Depends(get_user_permissions)])
 
 #
 # Providere - Provider

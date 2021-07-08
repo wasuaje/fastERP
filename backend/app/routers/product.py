@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from typing import List
 from sqlalchemy.orm import Session
-from ..dependencies import get_current_active_user, get_db
+from ..dependencies import get_current_active_user, get_db, get_user_permissions
 from ..schemas.product import Product as ProductSchema, ProductQuickCreate
 from ..schemas.product import ProductQuickUpdate, ProductResponse, ProductUpdateResponse
 from ..schemas.product import ProductDelete, ProductCreate, ProductUpdate
@@ -10,7 +10,8 @@ from ..crud.product import get_products, create_product, update_product, get_pro
 from ..crud.product import quick_create_product, quick_update_product
 from ..crud.product import delete_product
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(get_current_active_user),
+                                 Depends(get_user_permissions)])
 
 #
 # Product

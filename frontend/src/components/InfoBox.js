@@ -6,8 +6,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
-
-export default function InfoBox(props) {
+const InfoBox = React.forwardRef((props, ref) => {
   const {  opn, title, body, handleDialogClose } = props;
 
   return (    
@@ -31,4 +30,6 @@ export default function InfoBox(props) {
         </DialogActions>
       </Dialog>    
   );
-}
+})
+
+export default InfoBox

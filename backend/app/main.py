@@ -11,9 +11,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from .routers import client, auth, cash, product, event, speciality
 from .routers import profesional, cash_detail, invoice, invoice_detail
 from .routers import product_category, provider, purchase, purchase_detail
-
+from .routers import permission
+from .dependencies import get_current_active_user, get_user_permissions
 
 models.Base.metadata.create_all(bind=engine)
+
 
 app = FastAPI()
 
@@ -48,3 +50,4 @@ app.include_router(purchase.router)
 app.include_router(purchase_detail.router)
 app.include_router(event.router)
 app.include_router(auth.router)
+app.include_router(permission.router)

@@ -6,7 +6,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
-export default function GenericDialogBox(props) {
+const GenericDialogBox= React.forwardRef((props, ref) => {
   const { handleDialogOk, opn, title, body, handleDialogClose } = props;
 
   return (    
@@ -32,4 +32,6 @@ export default function GenericDialogBox(props) {
         </DialogActions>
       </Dialog>    
   );
-}
+})
+
+export default GenericDialogBox

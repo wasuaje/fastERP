@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from typing import List
 from sqlalchemy.orm import Session
-from ..dependencies import get_current_active_user, get_db
+from ..dependencies import get_current_active_user, get_db, get_user_permissions
 from ..schemas.profesional import Profesional as ProfesionalSchema, ProfesionalQuickCreate
 from ..schemas.profesional import ProfesionalQuickUpdate, ProfesionalResponse
 from ..schemas.profesional import ProfesionalDelete
@@ -10,7 +10,8 @@ from ..crud.profesional import get_profesionals, create_profesional, update_prof
 from ..crud.profesional import quick_create_profesional, quick_update_profesional
 from ..crud.profesional import delete_profesional
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(get_current_active_user),
+                                 Depends(get_user_permissions)])
 
 #
 # Profesional

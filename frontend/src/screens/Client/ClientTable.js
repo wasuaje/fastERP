@@ -2,14 +2,14 @@ import React,  { useEffect, useState }  from 'react';
 import MaterialTable from 'material-table';
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
+import PlaylistAdd from '@material-ui/icons/PlaylistAdd';
 import Paper from '@material-ui/core/Paper';
 import Modal from '@material-ui/core/Modal';
 import ClientForm from './ClientForm';
-import API from "../api";
-import useDataApi from "../apiHook"
-import Typography from '@material-ui/core/Typography';
-import GenericDialogBox from '../components/GenericDialogBox';
-import InfoBox from '../components/InfoBox';
+import GenericDialogBox from '../../components/GenericDialogBox';
+import InfoBox from '../../components/InfoBox';
+import DataService from "../../services/data.service";
+
 
 const classes = (theme) => ({
   paper: {
@@ -40,21 +40,8 @@ const classes = (theme) => ({
 });
 
 
-// let  cData = []
 
-// API("client/", "get")
-//   .then((data) => {
-//     console.log("data:", data);
-//     cData = data
-//   })
-//   .catch((err) => {  
-//     console.log("Error getting data: ", err.response);
-//         });
-
-
-
-
-  const ClientModal = (props) => {
+  const ClientModal = React.forwardRef((props, ref) => {
     const { handleFormCLose,showForm,idToUpdate } = props;
     
     return(
@@ -65,11 +52,46 @@ const classes = (theme) => ({
       aria-describedby="simple-modal-description">  
       <ClientForm idToUpdate={idToUpdate}/>
     </Modal>
-    )}
+    )})
 
-export default function ClientTable() {  
+
+const base_url = 'api'
+const endpoint = `${base_url}/client`
+   
+
+const ClientTable = React.forwardRef((props, ref) => {  
+   
+  const [data, setData] = useState([]);
+  useEffect(() => {
+    
+    retrieveData()
+  }, []); // Those ARE connectec
+ 
   
-  // const [clientData, setclientData] = useState(cData);
+  const retrieveData = () => {  
+    DataService.getAll(endpoint)
+      .then(response => {
+        setData(response.data)
+        // console.log(response.data);
+      })
+      .catch(e => {
+        openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)   
+      });
+  }   
+
+  const deleteData = (id) => {      
+    var dataDelete = {'id': id};
+    DataService.delete(endpoint, dataDelete)
+      .then(response => {        
+        openNoticeBox("Notice", "Client deleted successfully")   
+        retrieveData()
+      })
+      .catch(e => {  
+        openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)   
+      });            
+  }    
+  
+
   // INFO NOTIFICATION VARS
   const [infoOpen, setInfoOpen] = useState(false);
   const [infoTitle, setInfoTitle] = useState('');
@@ -88,8 +110,8 @@ export default function ClientTable() {
   const [showForm, setShowForm] = useState(false);
 
   // FORM FUNCTIONS
-  const handleFormCLose = () => {
-    doFetch(new Date().getTime())
+  const handleFormCLose = () => {    
+    retrieveData()
     setShowForm(false);    
   };
   
@@ -106,52 +128,37 @@ export default function ClientTable() {
   setInfoOpen(true)
 };
 
-const handleInfoClose = () => {
-  doFetch(new Date().getTime())
+const handleInfoClose = () => {  
+  retrieveData()
   setInfoOpen(false)
 };
 // *****************
 
  // DIALOG FUNCTIONS 
-  const handleDialogOk = () => {
-    doDelete({'id': idToDelete})           
-    setDialogOpen(false) 
-    openNoticeBox("Notice", "Client deleted succesfully")
+  const handleDialogOk = () => {    
+    deleteData(idToDelete)        
+    setDialogOpen(false)
   };
 
-  const handleDialogClose = () => {
-    setidToDelete(null)                
-    doFetch(new Date().getTime())
+  const handleDialogClose = () => {    
+    retrieveData()
+    setidToDelete(null)                            
     setDialogOpen(false) 
+    
   };
 
   const openDialogBox = (id) => {        
     setDialogueTitle("Delete Record?")
     setDialogueBody("Are you sure to delete Client Id: "+id)
     // console.log(dialogOpen, dialogueTitle, dialogueBody)
-    setidToDelete(id)
+    setidToDelete(id) 
     setDialogOpen(true)
   };
 
   
 
   // *******************
-  const [{ data, isLoading, isError }, doFetch] = useDataApi(
-    'client',
-    'get',
-    {},
-    'yes',
-    [],
-  );
   
-
-  const [{ dataDelete, isLoadingDelete, isErrorDelete }, doRefreshDelete, doDelete] = useDataApi(
-    'client',
-    'delete',
-    {},
-    'yes',
-    [],
-  );  
 
   return (
     <div >
@@ -167,12 +174,11 @@ const handleInfoClose = () => {
         title={infoTitle} 
         body={infoBody} />        
                                        
-    <ClientModal handleFormCLose={handleFormCLose} showForm={showForm} idToUpdate={idToUpdate}
-    />
-    <Paper className={classes.paper}>    
+    <ClientModal handleFormCLose={handleFormCLose} showForm={showForm} idToUpdate={idToUpdate}/>
+    <Paper className={classes.paper} >    
     
     <MaterialTable    
-      title=""
+      title="-"
       columns={[
         { title: 'ID', field: 'id'},
         { title: 'Name', field: 'name' },
@@ -182,16 +188,7 @@ const handleInfoClose = () => {
       //   { name: 'Mehmet', surname: 'Baran', birthYear: 1987, birthCity: 63 },
       //   { name: 'Zerya Betül', surname: 'Baran', birthYear: 2017, birthCity: 34 },
       // ]}   
-      data = {data}
-      components={{
-        Body: (props) => {if (isError) {
-          return (<Typography  variant="h6">Can´t Communicate with backend</Typography>)
-          }else{
-          return (<Typography  variant="h6">No records found</Typography>)
-          }
-        }
-                  
-      }}
+      data = {data}      
       actions={[
         {
           icon: 'edit',
@@ -201,6 +198,11 @@ const handleInfoClose = () => {
         {
           icon: 'delete',
           tooltip: 'Delete User',
+          onClick: (event, rowData) => openDialogBox(rowData.id)
+        },
+        {
+          icon: PlaylistAdd,
+          tooltip: 'Add Detail',
           onClick: (event, rowData) => openDialogBox(rowData.id)
         }
       ]}
@@ -214,4 +216,6 @@ const handleInfoClose = () => {
     </Fab>
     </div>
   )
-}
+})
+
+export default ClientTable;

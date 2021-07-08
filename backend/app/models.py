@@ -1,8 +1,9 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, Date, Float, DateTime
+from sqlalchemy import Column, ForeignKey, Integer, String, Date, Float, DateTime, Boolean
 from sqlalchemy.orm import relationship
 import datetime
 import os
 import sys
+
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(BASE_DIR)
@@ -219,3 +220,19 @@ class User(Base):
     is_staff = Column(Integer, default=0)
     is_active = Column(Integer, default=0)
     date_joined = Column(Date)
+    permission = relationship("UserPermission", back_populates="user")
+
+
+class UserPermission(Base):
+    __tablename__ = "auth_user_permission"
+
+    id = Column(Integer, primary_key=True, index=True)    
+    path = Column(String(200))
+    can_list = Column(Integer, default=0)
+    can_get = Column(Integer, default=0)        # get one
+    can_post = Column(Integer, default=0)    
+    can_patch = Column(Integer, default=0)
+    can_delete = Column(Integer, default=0)
+    created_on = Column(DateTime, default=datetime.datetime.now())
+    user_id = Column(Integer, ForeignKey("auth_user.id"))
+    user = relationship("User", back_populates="permission")

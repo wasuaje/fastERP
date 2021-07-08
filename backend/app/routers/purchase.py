@@ -1,13 +1,14 @@
 from fastapi import APIRouter, Depends, HTTPException
 from typing import List
 from sqlalchemy.orm import Session
-from ..dependencies import get_current_active_user, get_db
+from ..dependencies import get_current_active_user, get_db, get_user_permissions
 from ..schemas.purchase import Purchase, PurchaseCreate, PurchaseDelete, PurchaseResponse
 from ..schemas.auth import User
 from ..crud.purchase import get_purchasees, create_purchase
 from ..crud.purchase import get_purchase, delete_purchase, update_purchase
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(get_current_active_user),
+                                 Depends(get_user_permissions)])
 
 #
 # Caja - CASH
