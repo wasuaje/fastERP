@@ -59,11 +59,11 @@ def delete_invoice_details(invoice_detail: InvoiceDetailDelete,
     return db_invoice_detail
 
 
-@router.get("/api/invoice-detail/{invoice_detail_id}", response_model=InvoiceDetailResponse, tags=["InvoiceDetail"])
-def get_a_invoice_detail(invoice_detail_id: int, db: Session = Depends(get_db),
+@router.get("/api/invoice-detail/{invoice_id}", response_model=List[InvoiceDetailResponse], tags=["InvoiceDetail"])
+def get_a_invoice_detail(invoice_id: int, db: Session = Depends(get_db),
                          current_user: User = Depends(get_current_active_user)):
     db_invoice_detail = get_invoice_detail(
-        db, invoice_detail_id=invoice_detail_id)
+        db, invoice_id=invoice_id)
     if db_invoice_detail is None:
         raise HTTPException(status_code=404, detail="InvoiceDetail not found")
     return db_invoice_detail

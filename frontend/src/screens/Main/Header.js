@@ -15,6 +15,8 @@ import Tabs from '@material-ui/core/Tabs';
 import Toolbar from '@material-ui/core/Toolbar';
 import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
+import MenuItem from '@material-ui/core/MenuItem';
+import Select from '@material-ui/core/Select';
 import { withStyles } from '@material-ui/core/styles';
 
 const lightColor = 'rgba(255, 255, 255, 0.7)';
@@ -42,7 +44,8 @@ const styles = (theme) => ({
 });
 
 function Header(props) {
-  const { classes, onDrawerToggle, title } = props;
+  const { classes, onDrawerToggle, title,language,handleOnLanguageChangeClick } = props;
+
 
   return (
     <React.Fragment>
@@ -96,10 +99,17 @@ function Header(props) {
                 {title}
               </Typography>
             </Grid>
-            <Grid item>
-              <Button className={classes.button} variant="outlined" color="inherit" size="small">
-                Web setup
-              </Button>
+            <Grid item>              
+              <Select
+              className={classes.button} size="small"
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  value={language}
+                  onChange={handleOnLanguageChangeClick}
+                >
+                  <MenuItem value={"es"}>Español</MenuItem>
+                  <MenuItem value={"en"}>English</MenuItem>                  
+              </Select>
             </Grid>
             <Grid item>
               <Tooltip title="Help">
@@ -111,7 +121,7 @@ function Header(props) {
           </Grid>
         </Toolbar>
       </AppBar>
-      <AppBar
+      {/* <AppBar
         component="div"
         className={classes.secondaryBar}
         color="primary"
@@ -124,7 +134,7 @@ function Header(props) {
           <Tab textColor="inherit" label="Templates" />
           <Tab textColor="inherit" label="Usage" />
         </Tabs>
-      </AppBar>
+      </AppBar> */}
     </React.Fragment>
   );
 }

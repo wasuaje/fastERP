@@ -9,7 +9,7 @@ ENV PATH /frontend/node_modules/.bin:$PATH
 
 # install app dependencies
 COPY package.json ./
-# COPY yarn.lock ./
+COPY package-lock.json ./
 # RUN npm config set unsafe-perm true
 RUN npm install -g npm@7.19.0
 RUN npm install --silent

@@ -55,7 +55,10 @@ class InvoiceDetailResponse(Invoice):
     price: float
     invoice_id: int
     product: ProductResponse
+    total: Optional[float] = 0.00
 
     class Config:
         orm_mode = True
-        
+
+    def __init__(self, detail: InvoiceDetail, **data):
+        super().__init__(total=InvoiceDetail.qtty*InvoiceDetail.price, **data)

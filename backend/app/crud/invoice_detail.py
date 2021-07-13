@@ -7,9 +7,9 @@ def get_invoice_details(db: Session, skip: int = 0, limit: int = 100):
     return db.query(InvoiceDetailModel).offset(skip).limit(limit).all()
 
 
-def get_invoice_detail(db: Session, invoice_detail_id: int):
+def get_invoice_detail(db: Session, invoice_id: int):
     return db.query(InvoiceDetailModel).filter(
-        InvoiceDetailModel.id == invoice_detail_id).first()
+        InvoiceDetailModel.invoice_id == invoice_id).all()
 
 
 # TODO: Decrease stock by invoice.detail.qtty in product
@@ -17,8 +17,7 @@ def create_invoice_detail(db: Session, invoice_detail: InvoiceDetailSchema):
     db_invoice_detail = InvoiceDetailModel(qtty=invoice_detail.qtty,
                                            price=invoice_detail.price,
                                            invoice_id=invoice_detail.invoice_id,
-                                           product_id=invoice_detail.product_id,
-                                           profesional_id=invoice_detail.profesional_id
+                                           product_id=invoice_detail.product_id                                           
                                            )
     db.add(db_invoice_detail)
     db.commit()
@@ -31,8 +30,7 @@ def update_invoice_detail(db: Session, invoice_detail: InvoiceDetailSchema):
     invoice_detail_data.qtty = invoice_detail.qtty
     invoice_detail_data.price = invoice_detail.price
     invoice_detail_data.invoice_id = invoice_detail.invoice_id
-    invoice_detail_data.product_id = invoice_detail.product_id
-    invoice_detail_data.profesional_id = invoice_detail.profesional_id
+    invoice_detail_data.product_id = invoice_detail.product_id    
     db.commit()
     db.refresh(invoice_detail_data)
     return invoice_detail_data

@@ -1,5 +1,9 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, Date, Float, DateTime, Boolean
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy import Date, DateTime
+from sqlalchemy import Boolean, Float
+from sqlalchemy.sql import select, func
+from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import relationship, column_property
 import datetime
 import os
 import sys
@@ -121,6 +125,22 @@ class CashDetail(Base):
     cash = relationship("Cash", back_populates="cash_detail")
 
 
+class InvoiceDetail(Base):
+    __tablename__ = "app_invoicedetail"
+
+    id = Column(Integer, primary_key=True, index=True)
+    qtty = Column(Integer, default=1)
+    price = Column(Float, default=0.00)
+    invoice_id = Column(Integer, ForeignKey("app_invoice.id"))
+    product_id = Column(Integer, ForeignKey("app_product.id"))    
+    invoice = relationship("Invoice", back_populates="invoice_detail")
+    product = relationship("Product", back_populates="invoice_detail")        
+
+    @hybrid_property
+    def total(self):
+        return self.qtty * self.price
+
+
 class Invoice(Base):
     __tablename__ = "app_invoice"
 
@@ -133,23 +153,20 @@ class Invoice(Base):
     created_on = Column(DateTime, default=datetime.datetime.now())
     contact_id = Column(Integer, ForeignKey("app_contact.id"))
     profesional_id = Column(Integer, ForeignKey("app_profesional.id"))
-
     client = relationship("Client", back_populates="invoice")
     invoice_detail = relationship("InvoiceDetail", back_populates="invoice")
-    profesional = relationship("Profesional", back_populates="invoice")    
+    profesional = relationship("Profesional", back_populates="invoice")
+    # total = column_property(
+    #     select([func.sum(InvoiceDetail.total)]).
+    #     where(InvoiceDetail.invoice_id == id)
+    # )
+    # @aggregated('invoice_detail', Column(Float))
+    # def total(self):
+    #     return func.sum(InvoiceDetail.price)
+    @hybrid_property
+    def total(self):
+        return func.sum(self.invoice_detail.total)
 
-
-class InvoiceDetail(Base):
-    __tablename__ = "app_invoicedetail"
-
-    id = Column(Integer, primary_key=True, index=True)
-    qtty = Column(Integer, default=1)
-    price = Column(Float, default=0.00)
-    invoice_id = Column(Integer, ForeignKey("app_invoice.id"))
-    product_id = Column(Integer, ForeignKey("app_product.id"))    
-    invoice = relationship("Invoice", back_populates="invoice_detail")
-    product = relationship("Product", back_populates="invoice_detail")
-    
 
 class Purchase(Base):
     __tablename__ = "app_purchase"

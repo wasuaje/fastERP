@@ -1,3 +1,4 @@
+from sqlalchemy import func
 from typing import List, Optional
 import datetime
 from pydantic import BaseModel
@@ -21,7 +22,7 @@ class InvoiceDelete(BaseModel):
 
 
 class InvoiceBase(BaseModel):
-    date: datetime.datetime
+    date: datetime.date
     invoice: str
     order: Optional[str]
     payment_nro: Optional[str]
@@ -61,15 +62,17 @@ class Invoice(InvoiceBase):
 
 class InvoiceResponse(BaseModel):
     id: int
-    date: datetime.datetime
+    date: datetime.date
     invoice: str
     order: Optional[str]
     payment_nro: Optional[str]
     payment_method: Optional[str]
     profesional: ProfesionalResponse
-    client: ClientResponse
+    client: ClientResponse    
     created_on: datetime.datetime
+    total: Optional[float] = 0.00
     invoice_detail: List[InvoiceDetailResponse]
 
     class Config:
         orm_mode = True
+    

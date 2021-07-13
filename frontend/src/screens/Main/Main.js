@@ -16,19 +16,25 @@ import SettingsInputComponentIcon from '@material-ui/icons/SettingsInputComponen
 import TimerIcon from '@material-ui/icons/Timer';
 import SettingsIcon from '@material-ui/icons/Settings';
 import PhonelinkSetupIcon from '@material-ui/icons/PhonelinkSetup';
-
 import Navigator from './Navigator';
 import Content from '../Content';
 import Header from './Header';
 import ClientTable from '../Client/ClientTable';
+import InvoiceTable from '../Invoice/InvoiceTable';
+import { useTranslation } from "react-i18next";
+import i18n from "../../translations/i18n";
+// import {i18n} from '../../translations/i18n';
+
+
 
 
 function Copyright() {
+  const { t } = useTranslation();
   return (
     <Typography variant="body2" color="textSecondary" align="center">
       {'Copyright © '}
-      <Link color="inherit" href="https://material-ui.com/">
-        Your Website
+      <Link color="inherit" href="https://material-ui.com/">        
+        {t("website")}
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
@@ -177,6 +183,7 @@ const styles = {
 
 function Main(props) {
   const { classes } = props;
+  const [language, setLanguage] = useState('es');
   const [mobileOpen, setMobileOpen] = useState(false);
   const [ContentComponent, setContentComponent] = useState(<WithMaterialUI /> );
   const [headerTitle, setheaderTitle] = useState("");
@@ -186,6 +193,7 @@ function Main(props) {
       children: [
         { id: 'Authentication', icon: <PeopleIcon />, active: true, component: <WithMaterialUI /> },
         { id: 'Clients', icon: <DnsRoundedIcon /> , component: <ClientTable PaperProps={{ style: { width: drawerWidth } }}/>},
+        { id: 'Invoice', icon: <DnsRoundedIcon /> , component: <InvoiceTable PaperProps={{ style: { width: drawerWidth } }}/>},
         { id: 'Storage', icon: <PermMediaOutlinedIcon /> },
         { id: 'Hosting', icon: <PublicIcon /> },
         { id: 'Functions', icon: <SettingsEthernetIcon /> },
@@ -202,6 +210,12 @@ function Main(props) {
     },
   ])
   
+  const handleOnLanguageChangeClick=(e)=>{
+    e.preventDefault();
+    setLanguage(e.target.value);
+    i18n.changeLanguage(e.target.value);
+  }
+
   function handleOptClick(id, childId){    
     let newCategories  = [
       ...categories
@@ -261,7 +275,12 @@ function Main(props) {
           </Hidden>
         </nav>
         <div className={classes.app}>
-          <Header onDrawerToggle={handleDrawerToggle} title={headerTitle} />
+          <Header 
+            title={headerTitle}
+            onDrawerToggle={handleDrawerToggle} 
+            language={language}            
+            handleOnLanguageChangeClick={handleOnLanguageChangeClick}
+            />
           <main className={classes.main}>
             {ContentComponent }
           </main>
