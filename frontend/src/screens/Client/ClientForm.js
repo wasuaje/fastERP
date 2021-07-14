@@ -136,7 +136,7 @@ const ClientForm = React.forwardRef((props, ref) => {
 		'zip': '',
 	}
 		
-	const [data, setData] = useState([]);
+	const [data, setData] = useState(emptyData);
 	useEffect(() => {
 		let id = typeof idToUpdate === 'object' ? 0 :idToUpdate
 		getData(id)
@@ -145,7 +145,7 @@ const ClientForm = React.forwardRef((props, ref) => {
 	const getData = (id) => {      		
 		DataService.get(id, endpoint)
 		  .then(response => {        			
-			console.log("data get",response.data)			
+			// console.log("data get",response.data)			
 			setData(response.data)			
 		  })
 		  .catch(e => {  

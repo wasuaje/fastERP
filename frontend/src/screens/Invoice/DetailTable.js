@@ -1,21 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import MaterialTable from 'material-table';
-import Paper from '@material-ui/core/Paper';
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
-import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
-import CssBaseline from '@material-ui/core/CssBaseline';
 import Autocomplete from '@material-ui/lab/Autocomplete';
-import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
-import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
-import DateFnsUtils from '@date-io/date-fns';
-import { parseISO, format } from 'date-fns';
-import { KeyboardDatePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
-import dateFnsFormat from 'date-fns/format';
 import GenericDialogBox from '../../components/GenericDialogBox';
 import InfoBox from '../../components/InfoBox';
 import DataService from "../../services/data.service";
@@ -43,21 +34,22 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-const DetailForm = (props) => {	
+
+const DetailForm = (props) => {
 	const base_url = 'api'
 	const productEndpoint = `${base_url}/product`
-	const { idToUpdate } = props;
+
 	const getData = props.getData;
-	const [invoiceId, setInvoiceId] = useState(props.invoiceId)
+	const { invoiceId, setInvoiceId } = props
 	const [qtty, setQtty] = useState(1)
 	const [price, setPrice] = useState(0.00)
-	const openNoticeBox = props.openNoticeBox	
+	const openNoticeBox = props.openNoticeBox
 
 	const [productData, setProductData] = useState([]);
 	useEffect(() => {
 
 		retrieveProductData()
-	}, []); 
+	}, []);
 
 	const retrieveProductData = () => {
 		DataService.getAll(productEndpoint)
@@ -74,29 +66,29 @@ const DetailForm = (props) => {
 	const [productInputValue, setProductInputValue] = React.useState('');
 
 
-	const addData = (values) => {      		  
+	const addData = (values) => {
 		DataService.create(`${endpoint}/`, values)
-		  .then(response => {        			
-			// openNoticeBox("Notice", "Invoice created successfully")   			
-			// setInvoiceId(response.data.id)
-			// setData(emptyData)
-			getData(invoiceId)
-		  })
-		  .catch(e => {  			  
-			openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)   							
-		  });            
-	  }  	  
+			.then(response => {
+				// openNoticeBox("Notice", "Invoice created successfully")   			
+				// setInvoiceId(response.data.id)
+				// setData(emptyData)
+				getData(invoiceId)
+			})
+			.catch(e => {
+				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)
+			});
+	}
 
 	const AddDetail = (event) => {
-		event.preventDefault();		
-		 let values ={
-			 'invoice_id': invoiceId,
-			 'product_id': productValue.id,
-			 'qtty': qtty,
-			 'price': price,
-		 }
-		 console.log(values)					
-		 addData(values)
+		event.preventDefault();
+		let values = {
+			'invoice_id': invoiceId,
+			'product_id': productValue.id,
+			'qtty': qtty,
+			'price': price,
+		}
+		//  console.log(values)					
+		addData(values)
 		// if (invoiceId == 0) {
 		// 	addData(values)		
 		// 	// resetForm()		
@@ -107,8 +99,8 @@ const DetailForm = (props) => {
 		// 	updateData(values)
 		// }
 		// console.log("submit ",values)	
-		
-	 }
+
+	}
 
 	return (
 		<Grid container spacing={1}>
@@ -126,7 +118,7 @@ const DetailForm = (props) => {
 					options={productData}
 					getOptionLabel={(option) => option.name ? option.name : "-"}
 					onChange={(event, newValue) => {
-						setProductValue(newValue); 
+						setProductValue(newValue);
 						setPrice(newValue.price)
 					}}
 					inputValue={productInputValue}
@@ -137,7 +129,10 @@ const DetailForm = (props) => {
 
 					value={productValue ? productValue : ""}
 					renderInput={(params) => <TextField {...params} label="Product" />}
-					disabled = {invoiceId == 0 ? true : false}
+					disabled={invoiceId === 0 ? true : false}
+					getOptionSelected={(option, value) => option.value === value.value}
+
+
 				/>
 			</Grid>
 			<Grid item xs={2}>
@@ -150,7 +145,7 @@ const DetailForm = (props) => {
 					onChange={event => setQtty(event.target.value)}
 					value={qtty}
 					style={{ marginTop: '-1px' }}
-					disabled = {invoiceId == 0 ? true : false}
+					disabled={invoiceId === 0 ? true : false}
 				/>
 			</Grid>
 			<Grid item xs={2}>
@@ -161,9 +156,9 @@ const DetailForm = (props) => {
 					label="price"
 					name="price"
 					onChange={event => setPrice(event.target.value)}
-					value={price}
+					value={price ? price : 0}
 					style={{ marginTop: '-1px' }}
-					disabled = {invoiceId == 0 ? true : false}
+					disabled={invoiceId === 0 ? true : false}
 				/>
 			</Grid>
 			<Grid item xs={2}>
@@ -175,12 +170,12 @@ const DetailForm = (props) => {
 					name="total"
 					disabled
 					// onChange={event => { }}
-					value={price*qtty}
+					value={price * qtty ? price * qtty : 0}
 					style={{ marginTop: '-1px' }}
 				/>
 			</Grid>
 			<Grid item xs={2}>
-				<Fab color="default" size="small" aria-label="add" onClick={ AddDetail } style={{ marginTop: '25px' }}  >
+				<Fab color="default" size="small" aria-label="add" onClick={AddDetail} style={{ marginTop: '25px' }}  >
 					<AddIcon />
 				</Fab>
 			</Grid>
@@ -195,8 +190,10 @@ const invoiceEndpoint = `${base_url}/invoice`
 
 const DetailTable = (props) => {
 
-	const [invoiceId, setInvoiceId] = useState(props.invoiceId)
 	const [detailTotal, setDetailTotal] = useState("0.00")
+	const { invoiceId, setInvoiceId } = props	
+
+	const [showForm, setShowForm] = useState(false);
 
 	const classes = useStyles();
 
@@ -249,7 +246,7 @@ const DetailTable = (props) => {
 	const getData = (id) => {
 		DataService.get(id, endpoint)
 			.then(response => {
-				console.log("get data", response.data)
+				// console.log("get data", response.data)
 				setDetailData(response.data)
 				// setInvoiceNumber(response.data.id)
 				// setInvoiceId(response.data.id)
@@ -262,15 +259,15 @@ const DetailTable = (props) => {
 				// setProfesionalInputValue(response.data.profesional.name)
 				// setProfesionalValue(response.data.profesional)
 				// console.log("get data2", detailData)
-				var  sumdetail = 0;
-				response.data.forEach (function(record){
-        				sumdetail += record.total;
-    				});
+				var sumdetail = 0;
+				response.data.forEach(function (record) {
+					sumdetail += record.total;
+				});
 				setDetailTotal(sumdetail)
-					// console.log("sumdet",sumdetail)
+				// console.log("sumdet",sumdetail)
 			})
 			.catch(e => {
-				if (e.response.status != '404') {
+				if (e.response.status !== '404') {
 					openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)
 					// setData(emptyData)
 				} else {
@@ -281,19 +278,19 @@ const DetailTable = (props) => {
 			});
 	}
 
-	const deleteDetail = (id) => {      
-		var dataDelete = {'id': id};
+	const deleteDetail = (id) => {
+		var dataDelete = { 'id': id };
 		DataService.delete(endpoint, dataDelete)
-		  .then(response => {        
-			// openNoticeBox("Notice", "Invoice deleted successfully")   
-			getData(invoiceId)
-		  })
-		  .catch(e => {  
-			openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)   
-		  });            
-	  }    
-	 
-	  
+			.then(response => {
+				// openNoticeBox("Notice", "Invoice deleted successfully")   
+				getData(invoiceId)
+			})
+			.catch(e => {
+				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)
+			});
+	}
+
+
 	return (
 		<Grid container spacing={2}>
 			<GenericDialogBox
@@ -318,7 +315,7 @@ const DetailTable = (props) => {
 					{ title: 'Total', field: 'total' }
 				]}
 				data={detailData}
-				actions={[					
+				actions={[
 					{
 						icon: 'delete',
 						tooltip: 'Delete detail',
@@ -344,7 +341,7 @@ const DetailTable = (props) => {
 			/>
 			<div style={{ align: 'right', width: '500px', textAlignLast: 'right' }}>
 				<Typography variant="h5" component="h5">
-					Total: {parseFloat(detailTotal).toFixed(2) }
+					Total: {parseFloat(detailTotal).toFixed(2)}
 				</Typography>
 			</div>
 		</Grid>

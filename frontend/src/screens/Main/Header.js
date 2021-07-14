@@ -18,6 +18,7 @@ import Typography from '@material-ui/core/Typography';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import { withStyles } from '@material-ui/core/styles';
+import { useTranslation } from "react-i18next";
 
 const lightColor = 'rgba(255, 255, 255, 0.7)';
 
@@ -46,6 +47,7 @@ const styles = (theme) => ({
 function Header(props) {
   const { classes, onDrawerToggle, title,language,handleOnLanguageChangeClick } = props;
 
+  const { t } = useTranslation();
 
   return (
     <React.Fragment>
@@ -67,7 +69,7 @@ function Header(props) {
             <Grid item xs />
             <Grid item>
               <Link className={classes.link} href="#" variant="body2">
-                Go to docs
+                {t("header_goToDoc")}
               </Link>
             </Grid>
             <Grid item>

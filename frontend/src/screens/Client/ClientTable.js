@@ -2,14 +2,14 @@ import React,  { useEffect, useState }  from 'react';
 import MaterialTable from 'material-table';
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
-import PlaylistAdd from '@material-ui/icons/PlaylistAdd';
 import Paper from '@material-ui/core/Paper';
 import Modal from '@material-ui/core/Modal';
 import ClientForm from './ClientForm';
 import GenericDialogBox from '../../components/GenericDialogBox';
 import InfoBox from '../../components/InfoBox';
 import DataService from "../../services/data.service";
-
+import PatchedPagination from '../../components/PatchedPagination'
+import { useTranslation } from "react-i18next";
 
 const classes = (theme) => ({
   paper: {
@@ -60,7 +60,8 @@ const endpoint = `${base_url}/client`
    
 
 const ClientTable = React.forwardRef((props, ref) => {  
-   
+  const { t } = useTranslation();
+
   const [data, setData] = useState([]);
   useEffect(() => {
     
@@ -178,11 +179,13 @@ const handleInfoClose = () => {
     <Paper className={classes.paper} >    
     
     <MaterialTable    
-      title="-"
+      title={t("client_table_title")}
       columns={[
         { title: 'ID', field: 'id'},
         { title: 'Name', field: 'name' },
-        { title: 'Phone', field: 'phone' },        
+        { title: 'Phone', field: 'phone' },   
+        { title: 'Email', field: 'email' },   
+        { title: 'Address', field: 'address' },   
       ]}
       // data={[
       //   { name: 'Mehmet', surname: 'Baran', birthYear: 1987, birthCity: 63 },
@@ -199,15 +202,15 @@ const handleInfoClose = () => {
           icon: 'delete',
           tooltip: 'Delete User',
           onClick: (event, rowData) => openDialogBox(rowData.id)
-        },
-        {
-          icon: PlaylistAdd,
-          tooltip: 'Add Detail',
-          onClick: (event, rowData) => openDialogBox(rowData.id)
-        }
+        }        
       ]}
       options={{        
-        actionsColumnIndex: -1
+        actionsColumnIndex: -1,
+        exportButton: true,
+        // paging: false
+      }}    
+      components={{
+        Pagination: PatchedPagination,
       }}      
     />    
     </Paper>

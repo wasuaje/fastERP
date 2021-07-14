@@ -47,8 +47,11 @@ const DATE_FORMAT = 'yyyy-MM-dd';
 const InvoiceForm = React.forwardRef((props, ref) => {	
 	
 	const { idToUpdate } = props;
-	const [invoiceId, setInvoiceId] = useState(props.idToUpdate)	
-
+	const [invoiceId, setInvoiceId] = useState(props.idToUpdate)
+	useEffect(() => {
+		let isActive = true;    
+		return () => { isActive = false };
+	  }, [invoiceId,setInvoiceId]);
 	const [selectedDate, setSelectedDate] = useState(new Date());
 
 	// Getting Client data only once at the beggining
@@ -169,7 +172,7 @@ const InvoiceForm = React.forwardRef((props, ref) => {
 			setProfesionalValue(response.data.profesional)
 		  })
 		  .catch(e => {  
-			if (e.response.status != '404') {
+			if (e.response.status !== 404) {
 				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)   
 				// setData(emptyData)
 			}else{
@@ -212,7 +215,7 @@ const InvoiceForm = React.forwardRef((props, ref) => {
 			 'profesional_id': profesionalValue.id,
 			 'invoice': `FACT-${invoiceValue.replace('FACT-','')}`
 		 }					
-		if (invoiceId == 0) {
+		if (invoiceId === 0) {
 			addData(values)		
 			// resetForm()		
 		}
@@ -277,6 +280,7 @@ const InvoiceForm = React.forwardRef((props, ref) => {
 							
 							value={clientValue ? clientValue : ""}							
 							renderInput={(params) => <TextField {...params} label="Client" variant="outlined" />}
+							getOptionSelected={(option, value) => option.value === value.value}
 						/>
 						<MuiPickersUtilsProvider utils={DateFnsUtils}>
 						<KeyboardDatePicker
@@ -311,11 +315,17 @@ const InvoiceForm = React.forwardRef((props, ref) => {
 							value={profesionalValue ? profesionalValue : ""}
 							renderInput={(params) => <TextField {...params} label="Employee" variant="outlined" />}
 							style={{ marginTop: '7px' }} 												
+							getOptionSelected={(option, value) => option.value === value.value}
+
+
 						/>
 		 		      	
 					</Grid>															
 					<Grid item xs={8}>
-						<DetailTable invoiceId={invoiceId}/>
+						<DetailTable 
+							invoiceId={invoiceId}
+							setInvoiceId={setInvoiceId}
+						/>
 					</Grid>					
 					<Grid item xs={12}>
 						<Button
@@ -325,7 +335,7 @@ const InvoiceForm = React.forwardRef((props, ref) => {
 							color="primary"
 							className={classes.submit}
 						>
-							{invoiceId == 0 ? 'Save' : 'Update'}
+							{invoiceId === 0 ? 'Save' : 'Update'}
 						</Button>						
 					</Grid>					
 				</Grid>

@@ -11,28 +11,6 @@ import ListItemText from '@material-ui/core/ListItemText';
 import HomeIcon from '@material-ui/icons/Home';
 
 
-// const categories = [
-//   {
-//     id: 'Develop',
-//     children: [
-//       { id: 'Authentication', icon: <PeopleIcon />, active: true },
-//       { id: 'Database', icon: <DnsRoundedIcon /> },
-//       { id: 'Storage', icon: <PermMediaOutlinedIcon /> },
-//       { id: 'Hosting', icon: <PublicIcon /> },
-//       { id: 'Functions', icon: <SettingsEthernetIcon /> },
-//       { id: 'ML Kit', icon: <SettingsInputComponentIcon /> },
-//     ],
-//   },
-//   {
-//     id: 'Quality',
-//     children: [
-//       { id: 'Analytics', icon: <SettingsIcon /> },
-//       { id: 'Performance', icon: <TimerIcon /> },
-//       { id: 'Test Lab', icon: <PhonelinkSetupIcon /> },
-//     ],
-//   },
-// ];
-
 const styles = (theme) => ({
   categoryHeader: {
     paddingTop: theme.spacing(2),
@@ -99,7 +77,7 @@ function Navigator(props) {
               primary: classes.itemPrimary,
             }}
           >
-            Project Overview
+            Menu
           </ListItemText>
         </ListItem>
         {categories.map(({ id, children }) => (

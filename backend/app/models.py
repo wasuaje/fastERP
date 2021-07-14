@@ -80,7 +80,8 @@ class Product(Base):
 
     invoice_detail = relationship("InvoiceDetail", back_populates="product")
     purchase_detail = relationship("PurchaseDetail", back_populates="product")
-    category = relationship("ProductCategory", back_populates="product_category")
+    category = relationship(
+        "ProductCategory", back_populates="product_category")
 
 
 class Profesional(Base):
@@ -132,9 +133,9 @@ class InvoiceDetail(Base):
     qtty = Column(Integer, default=1)
     price = Column(Float, default=0.00)
     invoice_id = Column(Integer, ForeignKey("app_invoice.id"))
-    product_id = Column(Integer, ForeignKey("app_product.id"))    
+    product_id = Column(Integer, ForeignKey("app_product.id"))
     invoice = relationship("Invoice", back_populates="invoice_detail")
-    product = relationship("Product", back_populates="invoice_detail")        
+    product = relationship("Product", back_populates="invoice_detail")
 
     @hybrid_property
     def total(self):
@@ -156,13 +157,7 @@ class Invoice(Base):
     client = relationship("Client", back_populates="invoice")
     invoice_detail = relationship("InvoiceDetail", back_populates="invoice")
     profesional = relationship("Profesional", back_populates="invoice")
-    # total = column_property(
-    #     select([func.sum(InvoiceDetail.total)]).
-    #     where(InvoiceDetail.invoice_id == id)
-    # )
-    # @aggregated('invoice_detail', Column(Float))
-    # def total(self):
-    #     return func.sum(InvoiceDetail.price)
+
     @hybrid_property
     def total(self):
         return func.sum(self.invoice_detail.total)
@@ -191,7 +186,7 @@ class PurchaseDetail(Base):
     qtty = Column(Integer, default=1)
     price = Column(Float, default=0.00)
     purchase_id = Column(Integer, ForeignKey("app_purchase.id"))
-    product_id = Column(Integer, ForeignKey("app_product.id"))    
+    product_id = Column(Integer, ForeignKey("app_product.id"))
 
     purchase = relationship("Purchase", back_populates="purchase_detail")
     product = relationship("Product", back_populates="purchase_detail")
@@ -200,7 +195,7 @@ class PurchaseDetail(Base):
 class Speciality(Base):
     __tablename__ = "app_speciality"
 
-    id = Column(Integer, primary_key=True, index=True)    
+    id = Column(Integer, primary_key=True, index=True)
     name = Column(String(150))
     created_on = Column(DateTime, default=datetime.datetime.now())
 
@@ -243,13 +238,23 @@ class User(Base):
 class UserPermission(Base):
     __tablename__ = "auth_user_permission"
 
-    id = Column(Integer, primary_key=True, index=True)    
+    id = Column(Integer, primary_key=True, index=True)
     path = Column(String(200))
     can_list = Column(Integer, default=0)
     can_get = Column(Integer, default=0)        # get one
-    can_post = Column(Integer, default=0)    
+    can_post = Column(Integer, default=0)
     can_patch = Column(Integer, default=0)
     can_delete = Column(Integer, default=0)
     created_on = Column(DateTime, default=datetime.datetime.now())
     user_id = Column(Integer, ForeignKey("auth_user.id"))
     user = relationship("User", back_populates="permission")
+
+
+class Configuration(Base):
+    __tablename__ = "app_configuration"
+
+    id = Column(Integer, primary_key=True, index=True)
+    config_name = Column(String(50))
+    config_value = Column(String(500))
+    created_on = Column(DateTime, default=datetime.datetime.now())
+

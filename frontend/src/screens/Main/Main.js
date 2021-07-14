@@ -1,4 +1,4 @@
-import React,  { useEffect, useState }  from 'react';
+import React,  { useState }  from 'react';
 import PropTypes from 'prop-types';
 import {ThemeProvider, withStyles } from '@material-ui/core/styles';
 import { unstable_createMuiStrictModeTheme as createMuiTheme } from '@material-ui/core';
@@ -6,7 +6,7 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import Hidden from '@material-ui/core/Hidden';
 import Typography from '@material-ui/core/Typography';
 import Link from '@material-ui/core/Link';
-import WithMaterialUI from '../FormTest';
+import Authenticate from '../Authenticate/Authenticate';
 import PeopleIcon from '@material-ui/icons/People';
 import DnsRoundedIcon from '@material-ui/icons/DnsRounded';
 import PermMediaOutlinedIcon from '@material-ui/icons/PhotoSizeSelectActual';
@@ -17,14 +17,11 @@ import TimerIcon from '@material-ui/icons/Timer';
 import SettingsIcon from '@material-ui/icons/Settings';
 import PhonelinkSetupIcon from '@material-ui/icons/PhonelinkSetup';
 import Navigator from './Navigator';
-import Content from '../Content';
 import Header from './Header';
 import ClientTable from '../Client/ClientTable';
 import InvoiceTable from '../Invoice/InvoiceTable';
 import { useTranslation } from "react-i18next";
 import i18n from "../../translations/i18n";
-// import {i18n} from '../../translations/i18n';
-
 
 
 
@@ -34,7 +31,7 @@ function Copyright() {
     <Typography variant="body2" color="textSecondary" align="center">
       {'Copyright © '}
       <Link color="inherit" href="https://material-ui.com/">        
-        {t("website")}
+        {t("main_website")}
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
@@ -184,28 +181,46 @@ const styles = {
 function Main(props) {
   const { classes } = props;
   const [language, setLanguage] = useState('es');
+  const { t } = useTranslation();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [ContentComponent, setContentComponent] = useState(<WithMaterialUI /> );
+  const [ContentComponent, setContentComponent] = useState(<Authenticate /> );
   const [headerTitle, setheaderTitle] = useState("");
   const [categories, setCategories] = useState([
     {
-      id: 'Develop',
+      id: t("menu_process"),
       children: [
-        { id: 'Authentication', icon: <PeopleIcon />, active: true, component: <WithMaterialUI /> },
-        { id: 'Clients', icon: <DnsRoundedIcon /> , component: <ClientTable PaperProps={{ style: { width: drawerWidth } }}/>},
-        { id: 'Invoice', icon: <DnsRoundedIcon /> , component: <InvoiceTable PaperProps={{ style: { width: drawerWidth } }}/>},
-        { id: 'Storage', icon: <PermMediaOutlinedIcon /> },
-        { id: 'Hosting', icon: <PublicIcon /> },
-        { id: 'Functions', icon: <SettingsEthernetIcon /> },
-        { id: 'ML Kit', icon: <SettingsInputComponentIcon /> },
+        { id: t('menu_authenticate'), icon: <PeopleIcon />, active: true, component: <Authenticate /> },        
+        { id: t('menu_invoice'), icon: <DnsRoundedIcon /> , component: <InvoiceTable PaperProps={{ style: { width: drawerWidth } }}/>},
+        { id: t('menu_purchase'), icon: <PermMediaOutlinedIcon /> },
+        { id: t('menu_cash'), icon: <PublicIcon /> },
+        { id: t('menu_inventory'), icon: <PublicIcon /> },
       ],
     },
     {
-      id: 'Quality',
+      id: t("menu_tables"),
       children: [
-        { id: 'Analytics', icon: <SettingsIcon /> },
-        { id: 'Performance', icon: <TimerIcon /> },
-        { id: 'Test Lab', icon: <PhonelinkSetupIcon /> },
+        { id: t('menu_client'), icon:  <PeopleIcon /> , component: <ClientTable PaperProps={{ style: { width: drawerWidth } }}/>},
+        { id: t('menu_provider'), icon: <SettingsIcon /> },
+        { id: t('menu_product_category'), icon: <TimerIcon /> },
+        { id: t('menu_product'), icon: <PhonelinkSetupIcon /> },
+        { id: t('menu_employee'), icon: <PhonelinkSetupIcon /> },
+      ],
+    },
+    {
+      id: t("menu_report"),
+      children: [
+        { id: t('menu_report_sales'), icon: <DnsRoundedIcon /> , component: <ClientTable PaperProps={{ style: { width: drawerWidth } }}/>},
+        { id: t('menu_report_purchase'), icon: <SettingsIcon /> },
+        { id: t('menu_report_cash'), icon: <TimerIcon /> },        
+        { id: t('menu_report_inventory'), icon: <TimerIcon /> },        
+      ],
+    },
+    {
+      id: t("menu_setting"),
+      children: [
+        { id:  t('menu_settings'), icon:  <SettingsIcon /> , component: <ClientTable PaperProps={{ style: { width: drawerWidth } }}/>},        
+        { id:  t('menu_users'), icon:  <SettingsIcon /> , component: <ClientTable PaperProps={{ style: { width: drawerWidth } }}/>},        
+        { id:  t('menu_permissions'), icon:  <SettingsIcon /> , component: <ClientTable PaperProps={{ style: { width: drawerWidth } }}/>},        
       ],
     },
   ])
@@ -232,13 +247,13 @@ function Main(props) {
         }                
       } 
   // set new active
-    for (var i = 0; i < newCategories.length; i++) {
-      if (newCategories[i].id === id) {        
-        for (var j = 0; j < newCategories[i].children.length; j++) {          
-          if (newCategories[i].children[j].id === childId) {            
-              newCategories[i].children[j].active=true                            
-              setContentComponent(newCategories[i].children[j].component)
-              setheaderTitle(newCategories[i].children[j].id)
+    for (var ii = 0; ii < newCategories.length; ii++) {
+      if (newCategories[ii].id === id) {        
+        for (var jj = 0; jj < newCategories[ii].children.length; jj++) {          
+          if (newCategories[ii].children[jj].id === childId) {            
+              newCategories[ii].children[jj].active=true                            
+              setContentComponent(newCategories[ii].children[jj].component)
+              setheaderTitle(newCategories[ii].children[jj].id)
             break;
           }          
         }                
