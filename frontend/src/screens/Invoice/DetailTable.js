@@ -189,9 +189,28 @@ const invoiceEndpoint = `${base_url}/invoice`
 
 
 const DetailTable = (props) => {
+	const { invoiceId, setInvoiceId, dctValue, taxValue } = props	
 
-	const [detailTotal, setDetailTotal] = useState("0.00")
-	const { invoiceId, setInvoiceId } = props	
+	const [detailSubTotal, setDetailSubTotal] = useState("0.00")
+
+	const [detailDctTotal, setDetailDctTotal] = useState("0.00")
+	useEffect(() => {
+		setDetailDctTotal(detailSubTotal*(dctValue/100))
+	}, [dctValue, detailSubTotal ]);
+
+	const [detailTaxTotal, setDetailTaxTotal] = useState("0.00")
+	useEffect(() => {
+		let tmpdct = detailSubTotal*(dctValue/100)
+		setDetailTaxTotal((detailSubTotal-tmpdct)*(taxValue/100))
+	}, [taxValue, detailSubTotal ]);
+
+	const [detailTotal, setDetailTotal] = useState("0.00")							
+	useEffect(() => {
+		// console.log(detailSubTotal,detailDctTotal,detailTaxTotal)
+		let tmpdct = detailSubTotal*(dctValue/100)
+		let tmptax = (detailSubTotal-tmpdct)*(taxValue/100)
+		setDetailTotal(detailSubTotal-tmpdct+tmptax)
+	}, [taxValue, dctValue, detailSubTotal ]);
 
 	const [showForm, setShowForm] = useState(false);
 
@@ -247,24 +266,12 @@ const DetailTable = (props) => {
 		DataService.get(id, endpoint)
 			.then(response => {
 				// console.log("get data", response.data)
-				setDetailData(response.data)
-				// setInvoiceNumber(response.data.id)
-				// setInvoiceId(response.data.id)
-				// setInvoiceValue(response.data.invoice)
-				// // setSelectedDate(dateFnsFormat(response.data.date, 'dd/MM/yyyy'))			
-				// // setSelectedDate(response.data.date)			
-				// setSelectedDate(parseISO(response.data.date))
-				// setProductInputValue(response.data.product.name)
-				// setProductValue(response.data.product)
-				// setProfesionalInputValue(response.data.profesional.name)
-				// setProfesionalValue(response.data.profesional)
-				// console.log("get data2", detailData)
+				setDetailData(response.data)				
 				var sumdetail = 0;
 				response.data.forEach(function (record) {
 					sumdetail += record.total;
 				});
-				setDetailTotal(sumdetail)
-				// console.log("sumdet",sumdetail)
+				setDetailSubTotal(sumdetail)				
 			})
 			.catch(e => {
 				if (e.response.status !== '404') {
@@ -340,6 +347,15 @@ const DetailTable = (props) => {
 				}}
 			/>
 			<div style={{ align: 'right', width: '500px', textAlignLast: 'right' }}>
+				<Typography variant="h6" component="h6">
+					Subtotal: {parseFloat(detailSubTotal).toFixed(2)}
+				</Typography>
+				<Typography variant="h6" component="h6">
+					Discount ({parseFloat(dctValue).toFixed(2)}): {parseFloat(detailDctTotal).toFixed(2)}
+				</Typography>
+				<Typography variant="h6" component="h6">
+					Tax ({parseFloat(taxValue).toFixed(2)}): {parseFloat(detailTaxTotal).toFixed(2)}
+				</Typography>
 				<Typography variant="h5" component="h5">
 					Total: {parseFloat(detailTotal).toFixed(2)}
 				</Typography>

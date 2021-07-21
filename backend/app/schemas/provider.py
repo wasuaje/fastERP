@@ -54,7 +54,8 @@ class ProviderQuickUpdate(ProviderBase):
 # Suitable for update full provider, and providers get
 class Provider(ProviderQuickCreate):
     date: Optional[datetime.date]
-    email: Optional[str]
+    email: Optional[str]    
+    website: Optional[str]
     cuit: Optional[str]
     address: Optional[str]
     city: Optional[str]
@@ -65,15 +66,16 @@ class Provider(ProviderQuickCreate):
         orm_mode = True
         schema_extra = {
             "example": {
-                "name": "John Van Dame",
+                 "name": "John Van Dame",
                 "phone": "+5491121124334",
                 "date": "2021-01-21T00:00:00",
-                "cuit": "1-1112222-2",                
                 "email": "johnvdm@gmail.com",
+                "website": "www.mydomain.com",
                 "address": "My addres, my street",
                 "city": "San Martin",
                 "state": "Buenos Aires",
-                "zip_code": "1650"                
+                "zip_code": "1650",
+                "cuit": "1-100022000-4"               
             }
         }
 
@@ -85,14 +87,15 @@ class ProviderResponse(Provider, ProviderQuickCreate):
         schema_extra = {
             "example": {
                 "id": 999,
-                "name": "John Van Dame",
+                 "name": "John Van Dame",
                 "phone": "+5491121124334",
                 "date": "2021-01-21T00:00:00",
-                "cuit": "1-1112222-2",                
                 "email": "johnvdm@gmail.com",
+                "website": "www.mydomain.com",
                 "address": "My addres, my street",
                 "city": "San Martin",
                 "state": "Buenos Aires",
-                "zip_code": "1650"                
+                "zip_code": "1650",
+                "cuit": "1-100022000-4"             
             }
         }

@@ -1,4 +1,4 @@
-import React,  { useEffect, useState }  from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import { withStyles } from '@material-ui/core/styles';
@@ -9,7 +9,28 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import HomeIcon from '@material-ui/icons/Home';
+import { useTranslation } from "react-i18next";
+import PeopleIcon from '@material-ui/icons/People';
+import Category from '@material-ui/icons/Category';
+import LockOpen from '@material-ui/icons/LockOpen';
+import DnsRoundedIcon from '@material-ui/icons/DnsRounded';
+import PermMediaOutlinedIcon from '@material-ui/icons/PhotoSizeSelectActual';
+import PublicIcon from '@material-ui/icons/Public';
+import SettingsEthernetIcon from '@material-ui/icons/SettingsEthernet';
+import SettingsInputComponentIcon from '@material-ui/icons/SettingsInputComponent';
+import TimerIcon from '@material-ui/icons/Timer';
+import SettingsIcon from '@material-ui/icons/Settings';
+import PhonelinkSetupIcon from '@material-ui/icons/PhonelinkSetup';
+import SupervisorAccountIcon from '@material-ui/icons/SupervisorAccount';
+import PostAddIcon from '@material-ui/icons/PostAdd';
 
+import Authenticate from '../Authenticate/Authenticate';
+import { Receipt, Shop } from '@material-ui/icons';
+import InvoiceTable from '../Invoice/InvoiceTable';
+import ProductCategoryTable from '../ProductCategory/ProductCategoryTable';
+import ProductTable from '../Product/ProductTable';
+import ClientTable from '../Client/ClientTable';
+import ProviderTable from '../Provider/ProviderTable';
 
 const styles = (theme) => ({
   categoryHeader: {
@@ -52,15 +73,40 @@ const styles = (theme) => ({
   },
 });
 
+const ChildItem = (props) => {
+  const { classes, key, icon, title, component, setContentComponent, setheaderTitle } = props
+  const [active, setActive] = useState(false);
+
+  return (
+    <ListItem
+      key={key}
+      button
+      className={clsx(classes.item)}
+      onClick={() => {
+        setheaderTitle(title)
+        setContentComponent(component)
+        setActive(true)
+
+      }
+      }
+    >
+      <ListItemIcon className={classes.itemIcon}>{icon}</ListItemIcon>
+      <ListItemText classes={{ primary: classes.itemPrimary, }}>
+        {title}
+      </ListItemText>
+    </ListItem>
+  )
+}
+
 function Navigator(props) {
-  const { classes, categories, setCategories, handleOptClick, ...other } = props;  
-  
-    
-    
-    // newCategories[0].children[3].active=true
-    
-    // console.log("NC",newCategories)
-  
+  const { classes, categories, setCategories, handleOptClick, setCategoriesNew, setContentComponent, setheaderTitle, ...other } = props;
+  const { t } = useTranslation();
+
+
+  // newCategories[0].children[3].active=true
+
+  // console.log("NC",newCategories)
+
 
   return (
     <Drawer variant="permanent" {...other}>
@@ -80,38 +126,88 @@ function Navigator(props) {
             Menu
           </ListItemText>
         </ListItem>
-        {categories.map(({ id, children }) => (
-          <React.Fragment key={id}>
-            <ListItem className={classes.categoryHeader}>
-              <ListItemText
-                classes={{
-                  primary: classes.categoryHeaderPrimary,
-                }}
-              >
-                {id}
+        <ListItem className={classes.categoryHeader}>
+          <ListItemText classes={{ primary: classes.categoryHeaderPrimary, }} >
+            {t("menu_process")}
+          </ListItemText>
+        </ListItem>
+        <ChildItem
+          key="authenticate"
+          setContentComponent={setContentComponent}
+          active={true}
+          setheaderTitle={setheaderTitle}
+          icon={<LockOpen />}
+          component={<Authenticate />}
+          title={t("menu_authenticate")}
+          classes={classes}
+        />
+        <Divider className={classes.divider} />
+        <ListItem className={classes.categoryHeader}>
+          <ListItemText classes={{ primary: classes.categoryHeaderPrimary, }} >
+            {t("menu_sales")}
+          </ListItemText>
+        </ListItem>
+        <ChildItem
+          key="invoice"
+          setContentComponent={setContentComponent}
+          setheaderTitle={setheaderTitle}
+          icon={<Receipt />}
+          component={<InvoiceTable />}
+          title={t("menu_invoice")}
+          classes={classes}
+        />
+        <ChildItem
+          key="client"
+          setContentComponent={setContentComponent}
+          setheaderTitle={setheaderTitle}
+          icon={<SupervisorAccountIcon />}
+          component={<ClientTable />}
+          title={t("menu_client")}
+          classes={classes}
+        />
+        <ChildItem
+          key="product_category"
+          setContentComponent={setContentComponent}
+          setheaderTitle={setheaderTitle}
+          icon={<Category />}
+          component={<ProductCategoryTable />}
+          title={t("menu_product_category")}
+          classes={classes}
+        />
+        <ChildItem
+          key="product"
+          setContentComponent={setContentComponent}
+          setheaderTitle={setheaderTitle}
+          icon={<PostAddIcon />}
+          component={<ProductTable />}
+          title={t("menu_product")}
+          classes={classes}
+        />
+        <Divider className={classes.divider} />
+        <ListItem className={classes.categoryHeader}>
+              <ListItemText classes={{ primary: classes.categoryHeaderPrimary, }} >
+                {t("menu_purchases")}
               </ListItemText>
-            </ListItem>
-            {children.map(({ id: childId, icon, active }) => (
-              <ListItem
-                key={childId}
-                button
-                className={clsx(classes.item, active && classes.itemActiveItem)}
-                onClick = {()=>{handleOptClick(id,childId)}}
-              >
-                <ListItemIcon className={classes.itemIcon}>{icon}</ListItemIcon>
-                <ListItemText
-                  classes={{
-                    primary: classes.itemPrimary,
-                  }}                  
-                >
-                  {childId}                  
-                </ListItemText>
-              </ListItem>
-            ))}
-
-            <Divider className={classes.divider} />
-          </React.Fragment>
-        ))}
+        </ListItem>
+        <ChildItem
+          key="purchase"
+          setContentComponent={setContentComponent}
+          setheaderTitle={setheaderTitle}
+          icon={<Shop />}
+          component={""}
+          title={t("menu_purchase")}
+          classes={classes}
+        />
+        <ChildItem
+          key="provider"
+          setContentComponent={setContentComponent}
+          setheaderTitle={setheaderTitle}
+          icon={<SupervisorAccountIcon />}
+          component={<ProviderTable />}
+          title={t("menu_provider")}
+          classes={classes}
+        />
+        <Divider className={classes.divider} />
       </List>
     </Drawer>
   );

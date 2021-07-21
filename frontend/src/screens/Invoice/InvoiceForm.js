@@ -15,7 +15,8 @@ import GenericDialogBox from '../../components/GenericDialogBox';
 import InfoBox from '../../components/InfoBox';
 import DataService from "../../services/data.service";
 import DetailTable from './DetailTable';
-
+import { useTranslation } from "react-i18next";
+import { alpha } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme) => ({
 	paper: {
@@ -44,52 +45,59 @@ const clientEndpoint = `${base_url}/client`
 const profesionalEndpoint = `${base_url}/profesional`
 const DATE_FORMAT = 'yyyy-MM-dd';
 
-const InvoiceForm = React.forwardRef((props, ref) => {	
-	
+const InvoiceForm = React.forwardRef((props, ref) => {
+	const { t } = useTranslation();
 	const { idToUpdate } = props;
 	const [invoiceId, setInvoiceId] = useState(props.idToUpdate)
 	useEffect(() => {
-		let isActive = true;    
+		let isActive = true;
 		return () => { isActive = false };
-	  }, [invoiceId,setInvoiceId]);
+	}, [invoiceId, setInvoiceId]);
 	const [selectedDate, setSelectedDate] = useState(new Date());
+	const [selectedDueDate, setSelectedDueDate] = useState(new Date());
 
 	// Getting Client data only once at the beggining
 	const [clientData, setClientData] = useState([]);
 	useEffect(() => {
-	  
-	  retrieveClientData()
+
+		retrieveClientData()
 	}, []); // Those ARE connectec
- 
-	const retrieveClientData = () => {  
+
+	const retrieveClientData = () => {
 		DataService.getAll(clientEndpoint)
-		  .then(response => {
-			setClientData(response.data)
-			// console.log(response.data);
-		  })
-		  .catch(e => {
-			openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)   
-		  });
-	  }   	
+			.then(response => {
+				setClientData(response.data)
+				// console.log(response.data);
+			})
+			.catch(e => {
+				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)
+			});
+	}
+
+
+	const [bodyNoteValue,setBodyNoteValue] = useState("")
+	const [footNoteValue, setFootNoteValue] = useState("")
+	const [dctValue, setDctValue] = useState("")
+	const [taxValue, setTaxValue] = useState("")
 
 	// Getting profesional data only once at the beggining
 	const [profesionalData, setProfesionalData] = useState([]);
 	useEffect(() => {
-	  
-	  retrieveProfesionalData()
+
+		retrieveProfesionalData()
 	}, []); // Those ARE connectec
- 
-	const retrieveProfesionalData = () => {  
+
+	const retrieveProfesionalData = () => {
 		DataService.getAll(profesionalEndpoint)
-		  .then(response => {
-			setProfesionalData(response.data)
-			// console.log(response.data);
-		  })
-		  .catch(e => {
-			openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)   
-		  });
-	  }   	
-	
+			.then(response => {
+				setProfesionalData(response.data)
+				// console.log(response.data);
+			})
+			.catch(e => {
+				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)
+			});
+	}
+
 
 	//client combobox values
 	const [clientValue, setClientValue] = React.useState(clientData[0]);
@@ -133,7 +141,7 @@ const InvoiceForm = React.forwardRef((props, ref) => {
 		setInfoOpen(true)
 	};
 
-	const handleInfoClose = () => {		
+	const handleInfoClose = () => {
 		setInfoOpen(false)
 	};
 	// *****************
@@ -148,91 +156,104 @@ const InvoiceForm = React.forwardRef((props, ref) => {
 		'state': '',
 		'city': '',
 		'zip': '',
+		'dct': '',
+		'tax': '',
 	}
-		
+
 	const [data, setData] = useState([]);
 	useEffect(() => {
-		let id = typeof idToUpdate === 'object' ? 0 :idToUpdate
+		let id = typeof idToUpdate === 'object' ? 0 : idToUpdate
 		getData(id)
-	}, []); 
+	}, []);
 
-	const getData = (id) => {      		
+	const getData = (id) => {
 		DataService.get(id, endpoint)
-		  .then(response => {        										
-			// console.log("get data",response.data)		
-			setInvoiceId(response.data.id)
-			// setInvoice (response.data.id)
-			setInvoiceValue(response.data.invoice)
-			// setSelectedDate(dateFnsFormat(response.data.date, 'dd/MM/yyyy'))			
-			// setSelectedDate(response.data.date)			
-			setSelectedDate(parseISO(response.data.date))
-			setClientInputValue(response.data.client.name)
-			setClientValue(response.data.client)
-			setProfesionalInputValue(response.data.profesional.name)
-			setProfesionalValue(response.data.profesional)
-		  })
-		  .catch(e => {  
-			if (e.response.status !== 404) {
-				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)   
-				// setData(emptyData)
-			}else{
-				setData(emptyData)
-			}
-				
-		  });            
-	  }  
+			.then(response => {
+				// console.log("get data",response.data)		
+				setInvoiceId(response.data.id)
+				// setInvoice (response.data.id)
+				setInvoiceValue(response.data.invoice)
+				// setSelectedDate(dateFnsFormat(response.data.date, 'dd/MM/yyyy'))			
+				// setSelectedDate(response.data.date)			
+				setSelectedDate(parseISO(response.data.date))
+				setSelectedDueDate(parseISO(response.data.due_date))
+				setClientInputValue(response.data.client.name)
+				setClientValue(response.data.client)
+				setProfesionalInputValue(response.data.profesional.name)
+				setProfesionalValue(response.data.profesional)
+				setBodyNoteValue(response.data.body_note)
+				setFootNoteValue(response.data.foot_note)
+				setDctValue(response.data.dct)
+				setTaxValue(response.data.tax)
+			})
+			.catch(e => {
+				if (e.response.status !== 404) {
+					openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)
+					// setData(emptyData)
+				} else {
+					setData(emptyData)
+				}
 
-	  const updateData = (values) => {      		  		
+			});
+	}
+
+	const updateData = (values) => {
 		DataService.update(endpoint, values)
-		  .then(response => {        			
-			openNoticeBox("Notice", "Invoice saved successfully... you can add products now")
-			// setData(emptyData)
-		  })
-		  .catch(e => {  			  
-			openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`) 
-		  });            
-	  }  	  
+			.then(response => {
+				openNoticeBox("Notice", "Invoice saved successfully... you can add products now")
+				// setData(emptyData)
+			})
+			.catch(e => {
+				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)
+			});
+	}
 
-	  const addData = (values) => {      		  
+	const addData = (values) => {
 		DataService.create(`${endpoint}/`, values)
-		  .then(response => {        			
-			openNoticeBox("Notice", "Invoice created successfully")   			
-			setInvoiceId(response.data.id)
-			// setData(emptyData)
-		  })
-		  .catch(e => {  			  
-			openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)   							
-		  });            
-	  }  	  
-	
-	 const submitForm = (event) => {
+			.then(response => {
+				openNoticeBox("Notice", "Invoice created successfully")
+				setInvoiceId(response.data.id)
+				// setData(emptyData)
+			})
+			.catch(e => {
+				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)
+			});
+	}
+
+	const submitForm = (event) => {
 		event.preventDefault();
-		var newDate = ""
+		var newDate,newDueDate = ""
 		newDate = format(selectedDate, DATE_FORMAT)
-		 let values ={
-			 'contact_id': clientValue.id,
-			 'date': newDate,
-			 'profesional_id': profesionalValue.id,
-			 'invoice': `FACT-${invoiceValue.replace('FACT-','')}`
-		 }					
+		newDueDate = format(selectedDueDate, DATE_FORMAT)
+		let values = {
+			'contact_id': clientValue.id,
+			'date': newDate,
+			'due_date': newDueDate,
+			'profesional_id': profesionalValue.id,
+			'invoice': `FACT-${invoiceValue.replace('FACT-', '')}`,
+			'dct': dctValue,
+			'tax': taxValue,
+			'body_note': bodyNoteValue,
+			'foot_note': footNoteValue
+		}
 		if (invoiceId === 0) {
-			addData(values)		
+			addData(values)
 			// resetForm()		
 		}
-		if (invoiceId > 0 ) {			
+		if (invoiceId > 0) {
 			values.id = invoiceId
 			// console.log(values)
 			updateData(values)
 		}
 		// console.log("submit ",values)	
-		
-	 }
 
-	 const handleReset = (event) => {
+	}
 
-	 }
+	const handleReset = (event) => {
 
-	 const classes = useStyles();	 
+	}
+
+	const classes = useStyles();
 
 	return (
 		<Paper className={classes.paper}>
@@ -263,10 +284,10 @@ const InvoiceForm = React.forwardRef((props, ref) => {
 							label="Invoice"
 							name="invoice"
 							onChange={event => setInvoiceValue(event.target.value)}
-							value={invoiceValue}							
+							value={invoiceValue}
 						/>
 						<Autocomplete
-							id="client"														
+							id="client"
 							// value={value}
 							options={clientData}
 							getOptionLabel={(option) => option.name ? option.name : "-"}
@@ -277,26 +298,40 @@ const InvoiceForm = React.forwardRef((props, ref) => {
 							onInputChange={(event, newInputValue) => {
 								setClientInputValue(newInputValue);
 							}}
-							
-							value={clientValue ? clientValue : ""}							
+
+							value={clientValue ? clientValue : ""}
 							renderInput={(params) => <TextField {...params} label="Client" variant="outlined" />}
 							getOptionSelected={(option, value) => option.value === value.value}
 						/>
 						<MuiPickersUtilsProvider utils={DateFnsUtils}>
-						<KeyboardDatePicker
-							clearable="true"
-							value={selectedDate}
-							placeholder="2021-07-07"
-							onChange={date => setSelectedDate(date)}
-							// minDate={new Date()}
-							format={DATE_FORMAT}
-							autoOk
-							name="date"						
-							id="date"																				
-							variant="inline"
-							inputVariant="outlined"		
-							style={{ marginTop: '5px' }} 												
-						/>												
+							<KeyboardDatePicker
+								clearable="true"
+								value={selectedDate}
+								placeholder="2021-07-07"
+								onChange={date => setSelectedDate(date)}
+								// minDate={new Date()}
+								format={DATE_FORMAT}
+								autoOk
+								name="date"
+								id="date"
+								variant="inline"
+								inputVariant="outlined"
+								style={{ marginTop: '5px' }}
+							/>
+							<KeyboardDatePicker
+								clearable="true"
+								value={selectedDueDate}
+								placeholder="2021-07-07"
+								onChange={dueDate => setSelectedDueDate(dueDate)}
+								// minDate={new Date()}
+								format={DATE_FORMAT}
+								autoOk
+								name="due_date"
+								id="due_date"
+								variant="inline"
+								inputVariant="outlined"
+								style={{ marginTop: '5px' }}
+							/>
 						</MuiPickersUtilsProvider>
 						<Autocomplete
 							id="profesional"
@@ -314,19 +349,68 @@ const InvoiceForm = React.forwardRef((props, ref) => {
 							options={profesionalData}
 							value={profesionalValue ? profesionalValue : ""}
 							renderInput={(params) => <TextField {...params} label="Employee" variant="outlined" />}
-							style={{ marginTop: '7px' }} 												
+							style={{ marginTop: '7px' }}
 							getOptionSelected={(option, value) => option.value === value.value}
 
 
+						/>					
+						<TextField
+							variant="outlined"
+							margin="normal"
+							fullWidth
+							id="body_note"
+							label="Body Note"
+							name="body_note"
+							multiline
+          					maxRows={4}
+							onChange={event => setBodyNoteValue(event.target.value)}
+							value={bodyNoteValue}
+							style={{ marginTop: '5px' }}
 						/>
-		 		      	
-					</Grid>															
+						<TextField
+							variant="outlined"
+							margin="normal"
+							fullWidth
+							id="foot_note"
+							label="Foot Note"
+							name="foot_note"
+							multiline
+          					maxRows={4}
+							onChange={event => setFootNoteValue(event.target.value)}
+							value={footNoteValue}
+							style={{ marginTop: '-2px' }}
+						/>
+						<TextField
+							variant="outlined"
+							margin="normal"
+							fullWidth
+							id="dct"
+							label="Discount"
+							name="dct"
+							onChange={event => setDctValue(event.target.value)}
+							value={dctValue}
+							style={{ marginTop: '-2px' }}
+						/>
+						<TextField
+							variant="outlined"
+							margin="normal"
+							fullWidth
+							id="tax"
+							label="Tax"
+							name="tax"
+							onChange={event => setTaxValue(event.target.value)}
+							value={taxValue}
+							style={{ marginTop: '-2px' }}
+						/>
+					</Grid>
 					<Grid item xs={8}>
-						<DetailTable 
+						<DetailTable
 							invoiceId={invoiceId}
 							setInvoiceId={setInvoiceId}
+							dctValue={dctValue}
+							taxValue={taxValue}
 						/>
-					</Grid>					
+					</Grid>
 					<Grid item xs={12}>
 						<Button
 							type="submit"
@@ -335,15 +419,16 @@ const InvoiceForm = React.forwardRef((props, ref) => {
 							color="primary"
 							className={classes.submit}
 						>
-							{invoiceId === 0 ? 'Save' : 'Update'}
-						</Button>						
-					</Grid>					
+							{invoiceId === 0 ? t("save_form_button") : t("update_form_button")}
+
+						</Button>
+					</Grid>
 				</Grid>
-				</form>
+			</form>
 			<Box mt={8}>
 
 			</Box>
-			
+
 		</Paper>
 	)
 })

@@ -17,34 +17,10 @@ import { useTranslation } from "react-i18next";
 
 const validationSchema = yup.object().shape({
 	name: yup
-		.string('Enter client name')
+		.string('Enter category name')
 		.required('Name is required')
-		.min(4, 'Names should be of minimum 4 characters length'),
-	phone: yup
-		.string('Enter client phone')
-		.required('Phone is required')
-		.min(8, 'Phone should be of minimum 8 characters length'),
-	email: yup
-		.string('Enter your email')
-		.email('Enter a valid email')
-		.required('Email is required'),
-	website: yup
-		.string('Only strings allowed'),		
-	cuit: yup
-		.string('Enter your cuit'),		
-	address: yup
-		.string('Address')
-		.min(10, 'Address should be of minimum 10 characters length'),
-	state: yup
-		.string('State')
-		.min(5, 'State should be of minimum 5 characters length'),
-	city: yup
-		.string('City')
-		.min(5, 'City should be of minimum 5 characters length'),
-	zip: yup
-		.string('Zip Code')
-		.min(4, 'Zip Code should be of minimum 4 characters length')
-});
+		.min(4, 'Names should be of minimum 4 characters length'),	
+    });
 
 
 const useStyles = makeStyles((theme) => ({
@@ -70,12 +46,11 @@ const useStyles = makeStyles((theme) => ({
 
 
 const base_url = 'api'
-const endpoint = `${base_url}/client`
+const endpoint = `${base_url}/product-category`
 
 
-const ClientForm = React.forwardRef((props, ref) => {
+const ProductCategoryForm = React.forwardRef((props, ref) => {
 	const { t } = useTranslation();
-	
 	const { idToUpdate } = props;
 
 	// INFO NOTIFICATION VARS
@@ -122,12 +97,12 @@ const ClientForm = React.forwardRef((props, ref) => {
 		'name': '',
 		'phone': '',
 		'email': '',
-		'website': '',		
+		'age': '',
+		'gender': '',
 		'address': '',
 		'state': '',
 		'city': '',
 		'zip': '',
-		'cuit':''
 	}
 		
 	const [data, setData] = useState(emptyData);
@@ -156,7 +131,7 @@ const ClientForm = React.forwardRef((props, ref) => {
 	  const updateData = (values) => {      		  
 		DataService.update(endpoint, values)
 		  .then(response => {        			
-			openNoticeBox("Notice", t("record_updated_successfully", {"table": t("client_table_title")}))
+			openNoticeBox("Notice", "ProductCategory updated successfully")
 			setData(emptyData)
 		  })
 		  .catch(e => {  			  
@@ -167,7 +142,7 @@ const ClientForm = React.forwardRef((props, ref) => {
 	  const addData = (values) => {      		  
 		DataService.create(endpoint, values)
 		  .then(response => {        			
-			openNoticeBox("Notice", t("record_created_successfully", {"table": t("client_table_title")}))
+			openNoticeBox("Notice", "ProductCategory created successfully")   			
 			setData(emptyData)
 		  })
 		  .catch(e => {  			  
@@ -213,13 +188,13 @@ const ClientForm = React.forwardRef((props, ref) => {
 			<form className={classes.form} onSubmit={formik.handleSubmit} onReset={formik.handleReset}>
 				<Grid container spacing={1}>
 
-					<Grid item xs={6}>
+					<Grid item xs={12}>
 						<TextField
 							variant="outlined"
 							margin="normal"
 							fullWidth
 							id="name"
-							label={t("client_form_lbl_client_name")}
+							label="Category Name"
 							name="name"
 							value={formik.values.name}
 							onChange={formik.handleChange}
@@ -227,118 +202,7 @@ const ClientForm = React.forwardRef((props, ref) => {
 							helperText={formik.touched.name && formik.errors.name}
 						/>
 					</Grid>
-					<Grid item xs={6}>
-						<TextField
-							variant="outlined"
-							margin="normal"
-							fullWidth
-							id="phone"
-							label={t("client_form_lbl_client_phone")}
-							name="phone"
-							value={formik.values.phone}
-							onChange={formik.handleChange}
-							error={formik.touched.phone && Boolean(formik.errors.phone)}
-							helperText={formik.touched.phone && formik.errors.phone}
-						/>
-					</Grid>
-					<Grid item xs={4}>
-						<TextField
-							variant="outlined"
-							margin="normal"
-							fullWidth
-							id="email"
-							label={t("client_form_lbl_client_email")}
-							name="email"
-							value={formik.values.email}
-							onChange={formik.handleChange}
-							error={formik.touched.email && Boolean(formik.errors.email)}
-							helperText={formik.touched.email && formik.errors.email}
-						/>
-					</Grid>
-					<Grid item xs={4}>
-						<TextField
-							variant="outlined"
-							margin="normal"
-							fullWidth
-							id="website"
-							label={t("client_form_lbl_client_website")}
-							name="website"
-							value={formik.values.website}
-							onChange={formik.handleChange}
-							error={formik.touched.website && Boolean(formik.errors.website)}
-							helperText={formik.touched.website && formik.errors.website}
-						/>
-					</Grid>
-					<Grid item xs={4}>
-						<TextField
-							variant="outlined"
-							margin="normal"
-							fullWidth
-							id="cuit"
-							label={t("client_form_lbl_client_dnicuil")}
-							name="cuit"
-							value={formik.values.cuit}
-							onChange={formik.handleChange}
-							error={formik.touched.cuit && Boolean(formik.errors.cuit)}
-							helperText={formik.touched.cuit && formik.errors.cuit}
-						/>
-					</Grid>
-					<Grid item xs={12}>
-						<TextField
-							variant="outlined"
-							margin="normal"
-							fullWidth
-							id="address"
-							label={t("client_form_lbl_client_address")}
-							name="address"
-							value={formik.values.address}
-							onChange={formik.handleChange}
-							error={formik.touched.address && Boolean(formik.errors.address)}
-							helperText={formik.touched.address && formik.errors.address}
-						/>
-					</Grid>
-					<Grid item xs={4}>
-						<TextField
-							variant="outlined"
-							margin="normal"
-							fullWidth
-							id="state"
-							label={t("client_form_lbl_client_state")}
-							name="state"
-							value={formik.values.state}
-							onChange={formik.handleChange}
-							error={formik.touched.state && Boolean(formik.errors.state)}
-							helperText={formik.touched.state && formik.errors.state}
-						/>
-					</Grid>
-					<Grid item xs={4}>
-						<TextField
-							variant="outlined"
-							margin="normal"
-							fullWidth
-							id="city"
-							label={t("client_form_lbl_client_city")}
-							name="city"
-							value={formik.values.city}
-							onChange={formik.handleChange}
-							error={formik.touched.city && Boolean(formik.errors.city)}
-							helperText={formik.touched.city && formik.errors.city}
-						/>
-					</Grid>
-					<Grid item xs={4}>
-						<TextField
-							variant="outlined"
-							margin="normal"
-							fullWidth
-							id="zip"
-							label={t("client_form_lbl_client_zip")}
-							name="zip"
-							value={formik.values.zip}
-							onChange={formik.handleChange}
-							error={formik.touched.zip && Boolean(formik.errors.zip)}
-							helperText={formik.touched.zip && formik.errors.zip}
-						/>
-					</Grid>
+					
 					<Grid item xs={12}>
 						<Button
 							type="submit"
@@ -361,5 +225,4 @@ const ClientForm = React.forwardRef((props, ref) => {
 	)
 })
 
-export default ClientForm;
-    // ReactDOM.render(<WithMaterialUI />, document.getElementById('root'));
+export default ProductCategoryForm;

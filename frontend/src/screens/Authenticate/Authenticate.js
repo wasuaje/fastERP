@@ -76,9 +76,10 @@ const Authenticate = () => {
 
                     // you will have the exact same setters in your Login page/app too
                     Cookies.set('access_token', data.data.access_token, { expires: inOneHour })                    
-                    window.location.replace(
-                        `${window.location.href}`
-                    )
+                    // window.location.replace(
+                    //     `${window.location.href}`)
+                    window.location.reload(true)
+                    
                 })
                 .catch(err => {                    
                     console.log("Error getting token: ", err.response)

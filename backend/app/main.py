@@ -8,7 +8,7 @@ from .database import SessionLocal, engine
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
 from fastapi.middleware.cors import CORSMiddleware
-from .routers import client, auth, cash, product, event, speciality
+from .routers import client, auth, cash, product, event
 from .routers import profesional, cash_detail, invoice, invoice_detail
 from .routers import product_category, provider, purchase, purchase_detail
 from .routers import permission
@@ -43,7 +43,7 @@ app.include_router(provider.router)
 app.include_router(product_category.router)
 app.include_router(product.router)
 app.include_router(profesional.router)
-app.include_router(speciality.router)
+# app.include_router(speciality.router)
 app.include_router(cash.router)
 app.include_router(cash_detail.router)
 app.include_router(invoice.router)

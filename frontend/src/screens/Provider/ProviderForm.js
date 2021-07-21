@@ -17,11 +17,11 @@ import { useTranslation } from "react-i18next";
 
 const validationSchema = yup.object().shape({
 	name: yup
-		.string('Enter client name')
+		.string('Enter provider name')
 		.required('Name is required')
 		.min(4, 'Names should be of minimum 4 characters length'),
 	phone: yup
-		.string('Enter client phone')
+		.string('Enter provider phone')
 		.required('Phone is required')
 		.min(8, 'Phone should be of minimum 8 characters length'),
 	email: yup
@@ -70,10 +70,10 @@ const useStyles = makeStyles((theme) => ({
 
 
 const base_url = 'api'
-const endpoint = `${base_url}/client`
+const endpoint = `${base_url}/provider`
 
 
-const ClientForm = React.forwardRef((props, ref) => {
+const ProviderForm = React.forwardRef((props, ref) => {
 	const { t } = useTranslation();
 	
 	const { idToUpdate } = props;
@@ -156,7 +156,7 @@ const ClientForm = React.forwardRef((props, ref) => {
 	  const updateData = (values) => {      		  
 		DataService.update(endpoint, values)
 		  .then(response => {        			
-			openNoticeBox("Notice", t("record_updated_successfully", {"table": t("client_table_title")}))
+			openNoticeBox("Notice", t("record_updated_successfully", {"table": t("provider_table_title")}))
 			setData(emptyData)
 		  })
 		  .catch(e => {  			  
@@ -167,7 +167,7 @@ const ClientForm = React.forwardRef((props, ref) => {
 	  const addData = (values) => {      		  
 		DataService.create(endpoint, values)
 		  .then(response => {        			
-			openNoticeBox("Notice", t("record_created_successfully", {"table": t("client_table_title")}))
+			openNoticeBox("Notice", t("record_created_successfully", {"table": t("provider_table_title")}))
 			setData(emptyData)
 		  })
 		  .catch(e => {  			  
@@ -219,7 +219,7 @@ const ClientForm = React.forwardRef((props, ref) => {
 							margin="normal"
 							fullWidth
 							id="name"
-							label={t("client_form_lbl_client_name")}
+							label={t("provider_form_lbl_provider_name")}
 							name="name"
 							value={formik.values.name}
 							onChange={formik.handleChange}
@@ -233,7 +233,7 @@ const ClientForm = React.forwardRef((props, ref) => {
 							margin="normal"
 							fullWidth
 							id="phone"
-							label={t("client_form_lbl_client_phone")}
+							label={t("provider_form_lbl_provider_phone")}
 							name="phone"
 							value={formik.values.phone}
 							onChange={formik.handleChange}
@@ -247,7 +247,7 @@ const ClientForm = React.forwardRef((props, ref) => {
 							margin="normal"
 							fullWidth
 							id="email"
-							label={t("client_form_lbl_client_email")}
+							label={t("provider_form_lbl_provider_email")}
 							name="email"
 							value={formik.values.email}
 							onChange={formik.handleChange}
@@ -261,7 +261,7 @@ const ClientForm = React.forwardRef((props, ref) => {
 							margin="normal"
 							fullWidth
 							id="website"
-							label={t("client_form_lbl_client_website")}
+							label={t("provider_form_lbl_provider_website")}
 							name="website"
 							value={formik.values.website}
 							onChange={formik.handleChange}
@@ -275,7 +275,7 @@ const ClientForm = React.forwardRef((props, ref) => {
 							margin="normal"
 							fullWidth
 							id="cuit"
-							label={t("client_form_lbl_client_dnicuil")}
+							label={t("provider_form_lbl_provider_dnicuil")}
 							name="cuit"
 							value={formik.values.cuit}
 							onChange={formik.handleChange}
@@ -289,7 +289,7 @@ const ClientForm = React.forwardRef((props, ref) => {
 							margin="normal"
 							fullWidth
 							id="address"
-							label={t("client_form_lbl_client_address")}
+							label={t("provider_form_lbl_provider_address")}
 							name="address"
 							value={formik.values.address}
 							onChange={formik.handleChange}
@@ -303,7 +303,7 @@ const ClientForm = React.forwardRef((props, ref) => {
 							margin="normal"
 							fullWidth
 							id="state"
-							label={t("client_form_lbl_client_state")}
+							label={t("provider_form_lbl_provider_state")}
 							name="state"
 							value={formik.values.state}
 							onChange={formik.handleChange}
@@ -317,7 +317,7 @@ const ClientForm = React.forwardRef((props, ref) => {
 							margin="normal"
 							fullWidth
 							id="city"
-							label={t("client_form_lbl_client_city")}
+							label={t("provider_form_lbl_provider_city")}
 							name="city"
 							value={formik.values.city}
 							onChange={formik.handleChange}
@@ -331,7 +331,7 @@ const ClientForm = React.forwardRef((props, ref) => {
 							margin="normal"
 							fullWidth
 							id="zip"
-							label={t("client_form_lbl_client_zip")}
+							label={t("provider_form_lbl_provider_zip")}
 							name="zip"
 							value={formik.values.zip}
 							onChange={formik.handleChange}
@@ -361,5 +361,5 @@ const ClientForm = React.forwardRef((props, ref) => {
 	)
 })
 
-export default ClientForm;
+export default ProviderForm;
     // ReactDOM.render(<WithMaterialUI />, document.getElementById('root'));

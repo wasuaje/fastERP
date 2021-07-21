@@ -4,7 +4,7 @@ import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 import Paper from '@material-ui/core/Paper';
 import Modal from '@material-ui/core/Modal';
-import ClientForm from './ClientForm';
+import ProviderForm from './ProviderForm';
 import GenericDialogBox from '../../components/GenericDialogBox';
 import InfoBox from '../../components/InfoBox';
 import DataService from "../../services/data.service";
@@ -41,7 +41,7 @@ const classes = (theme) => ({
 
 
 
-  const ClientModal = React.forwardRef((props, ref) => {
+  const ProviderModal = React.forwardRef((props, ref) => {
     const { handleFormCLose,showForm,idToUpdate } = props;
     
     return(
@@ -50,16 +50,16 @@ const classes = (theme) => ({
       onClose={handleFormCLose}
       aria-labelledby="simple-modal-title"
       aria-describedby="simple-modal-description">  
-      <ClientForm idToUpdate={idToUpdate}/>
+      <ProviderForm idToUpdate={idToUpdate}/>
     </Modal>
     )})
 
 
 const base_url = 'api'
-const endpoint = `${base_url}/client`
+const endpoint = `${base_url}/provider`
    
 
-const ClientTable = React.forwardRef((props, ref) => {  
+const ProviderTable = React.forwardRef((props, ref) => {  
   const { t } = useTranslation();
 
   const [data, setData] = useState([]);
@@ -175,17 +175,17 @@ const handleInfoClose = () => {
         title={infoTitle} 
         body={infoBody} />        
                                        
-    <ClientModal handleFormCLose={handleFormCLose} showForm={showForm} idToUpdate={idToUpdate}/>
+    <ProviderModal handleFormCLose={handleFormCLose} showForm={showForm} idToUpdate={idToUpdate}/>
     <Paper className={classes.paper} >    
     
     <MaterialTable    
-      title={t("client_table_title")}
+      title={t("provider_table_title")}
       columns={[
         { title: 'ID', field: 'id'},
-        { title: t("client_table_column_name"), field: 'name' },
-        { title: t("client_table_column_phone"), field: 'phone' },   
-        { title: t("client_table_column_email"), field: 'email' },   
-        { title: t("client_table_column_address"), field: 'address' },   
+        { title: t("provider_table_column_name"), field: 'name' },
+        { title: t("provider_table_column_phone"), field: 'phone' },   
+        { title: t("provider_table_column_email"), field: 'email' },   
+        { title: t("provider_table_column_address"), field: 'address' },   
       ]}
       // data={[
       //   { name: 'Mehmet', surname: 'Baran', birthYear: 1987, birthCity: 63 },
@@ -221,4 +221,4 @@ const handleInfoClose = () => {
   )
 })
 
-export default ClientTable;
+export default ProviderTable;

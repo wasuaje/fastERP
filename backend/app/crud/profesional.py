@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from ..models import Profesional as ProfesionalModel
+from ..models import Employee as ProfesionalModel
 from ..schemas.profesional import Profesional as ProfesionalSchema, ProfesionalQuickCreate
 from ..schemas.profesional import ProfesionalQuickUpdate, ProfesionalDelete
 

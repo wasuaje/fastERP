@@ -20,6 +20,7 @@ def create_provider(db: Session, provider: ProviderSchema):
                                 date=provider.date,
                                 cuit=provider.cuit,
                                 email=provider.email,
+                                website=provider.website,
                                 address=provider.address,
                                 city=provider.city,
                                 state=provider.state,
@@ -37,6 +38,7 @@ def update_provider(db: Session, provider: ProviderSchema):
     provider_data.date = provider.date
     provider_data.cuit = provider.cuit
     provider_data.email = provider.email
+    provider_data.website = provider.website
     provider_data.address = provider.address
     provider_data.city = provider.city
     provider_data.state = provider.state

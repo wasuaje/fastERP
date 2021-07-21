@@ -4,7 +4,7 @@ import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 import Paper from '@material-ui/core/Paper';
 import Modal from '@material-ui/core/Modal';
-import ClientForm from './ClientForm';
+import ProductForm from '../Product/ProductForm';
 import GenericDialogBox from '../../components/GenericDialogBox';
 import InfoBox from '../../components/InfoBox';
 import DataService from "../../services/data.service";
@@ -41,7 +41,7 @@ const classes = (theme) => ({
 
 
 
-  const ClientModal = React.forwardRef((props, ref) => {
+  const ProductModal = React.forwardRef((props, ref) => {
     const { handleFormCLose,showForm,idToUpdate } = props;
     
     return(
@@ -50,16 +50,16 @@ const classes = (theme) => ({
       onClose={handleFormCLose}
       aria-labelledby="simple-modal-title"
       aria-describedby="simple-modal-description">  
-      <ClientForm idToUpdate={idToUpdate}/>
+      <ProductForm idToUpdate={idToUpdate}/>
     </Modal>
     )})
 
 
 const base_url = 'api'
-const endpoint = `${base_url}/client`
+const endpoint = `${base_url}/product`
    
 
-const ClientTable = React.forwardRef((props, ref) => {  
+const ProductTable = React.forwardRef((props, ref) => {  
   const { t } = useTranslation();
 
   const [data, setData] = useState([]);
@@ -175,17 +175,19 @@ const handleInfoClose = () => {
         title={infoTitle} 
         body={infoBody} />        
                                        
-    <ClientModal handleFormCLose={handleFormCLose} showForm={showForm} idToUpdate={idToUpdate}/>
+    <ProductModal handleFormCLose={handleFormCLose} showForm={showForm} idToUpdate={idToUpdate}/>
     <Paper className={classes.paper} >    
     
     <MaterialTable    
-      title={t("client_table_title")}
+      title={t("product_table_title")}
       columns={[
         { title: 'ID', field: 'id'},
-        { title: t("client_table_column_name"), field: 'name' },
-        { title: t("client_table_column_phone"), field: 'phone' },   
-        { title: t("client_table_column_email"), field: 'email' },   
-        { title: t("client_table_column_address"), field: 'address' },   
+        { title: t("product_table_column_code"), field: 'code' },
+        { title: t("product_table_column_name"), field: 'name' },
+        { title: t("product_table_column_category"), field: 'category.name' },
+        { title: t("product_table_column_format"), field: 'format' },
+        { title: t("product_table_column_price"), field: 'price' },
+        { title: t("product_table_column_stock"), field: 'stock' },
       ]}
       // data={[
       //   { name: 'Mehmet', surname: 'Baran', birthYear: 1987, birthCity: 63 },
@@ -221,4 +223,4 @@ const handleInfoClose = () => {
   )
 })
 
-export default ClientTable;
+export default ProductTable;

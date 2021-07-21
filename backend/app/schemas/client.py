@@ -53,19 +53,14 @@ class ClientQuickUpdate(ClientBase):
 
 # Suitable for update full client, and clients get
 class Client(ClientQuickCreate):
-    date: Optional[datetime.datetime]
-    age: Optional[int]
-    gender: Optional[str]
+    date: Optional[datetime.date]
     email: Optional[str]
+    website: Optional[str]
     address: Optional[str]
     city: Optional[str]
     state: Optional[str]
     zip_code: Optional[str]
-    dob: Optional[str]
-    driver_id: Optional[str]
-    auth_area: Optional[str]
-    auth_color: Optional[str]
-    acceptance: Optional[str]
+    cuit: Optional[str]
 
     class Config:
         orm_mode = True
@@ -74,18 +69,13 @@ class Client(ClientQuickCreate):
                 "name": "John Van Dame",
                 "phone": "+5491121124334",
                 "date": "2021-01-21T00:00:00",
-                "age": 29,
-                "gender": "M",
                 "email": "johnvdm@gmail.com",
+                "website": "www.mydomain.com",
                 "address": "My addres, my street",
                 "city": "San Martin",
                 "state": "Buenos Aires",
                 "zip_code": "1650",
-                "dob": "1100022",
-                "driver_id": "223232232",
-                "auth_area": "111111112",
-                "auth_color": "32323222",
-                "acceptance": 0
+                "cuit": "1-100022000-4"
             }
         }
 
@@ -99,20 +89,14 @@ class ClientResponse(Client, ClientQuickCreate):
                 "id": 999,
                 "name": "John Van Dame",
                 "phone": "+5491121124334",
-                "name": "John Van Dame",
-                "phone": "+5491121124334",
                 "date": "2021-01-21T00:00:00",
-                "age": 29,
-                "gender": "M",
                 "email": "johnvdm@gmail.com",
+                "website": "www.mydomain.com",
                 "address": "My addres, my street",
                 "city": "San Martin",
                 "state": "Buenos Aires",
                 "zip_code": "1650",
-                "dob": "1100022",
-                "driver_id": "223232232",
-                "auth_area": "111111112",
-                "auth_color": "32323222",
-                "acceptance": 0
+                "cuit": "1-100022000-4",
+
             }
         }

@@ -38,6 +38,7 @@ class ProductQuickCreate(BaseModel):
 class ProductQuickUpdate(ProductBase):
     name: str
     price: float
+    stock: int
     created_on: Optional[datetime.datetime] = datetime.datetime.now()
 
     class Config:
@@ -46,6 +47,7 @@ class ProductQuickUpdate(ProductBase):
             "example": {
                 "id": 999,
                 "name": "My Product ",
+                "stock": 23,
                 "price": 123.91
             }
         }
@@ -53,6 +55,10 @@ class ProductQuickUpdate(ProductBase):
 
 # Suitable for product get
 class Product(ProductQuickCreate):
+    code: str
+    price: float
+    cost: float
+    format: str    
     dct: Optional[float]
     tax: Optional[float]
     stock: Optional[int]
@@ -62,9 +68,12 @@ class Product(ProductQuickCreate):
         orm_mode = True
         schema_extra = {
             "example": {
+                "code": "A01",
                 "name": "My Product",
+                "format": "2 x 200 grs",
                 "category_id": 999,
                 "price": 123.91,
+                "cost": 100.00,
                 "stock": 2,
                 "bar_code": "1111222233334444",
                 "dct": 2.01,
@@ -75,6 +84,10 @@ class Product(ProductQuickCreate):
 
 # Suitable for product create full
 class ProductCreate(ProductQuickCreate):
+    code: str
+    price: float
+    cost: float
+    format: str
     dct: Optional[float]
     tax: Optional[float]
     stock: Optional[int]
@@ -85,9 +98,12 @@ class ProductCreate(ProductQuickCreate):
         orm_mode = True
         schema_extra = {
             "example": {
+                "code": "A01",
                 "name": "My Product",
+                "format": "2 x 200 grs",
                 "category_id": 999,
                 "price": 123.91,
+                "cost": 100.00,
                 "stock": 2,
                 "bar_code": "1111222233334444",
                 "dct": 2.01,
@@ -112,8 +128,11 @@ class ProductResponse(Product, ProductQuickCreate):
 
 
 class ProductUpdate(ProductBase):
-    name: str
+    code: str
+    name: str    
     price: float
+    cost: float
+    format: str
     dct: Optional[float]
     tax: Optional[float]
     stock: Optional[int]
@@ -133,6 +152,10 @@ class ProductUpdate(ProductBase):
 
 
 class ProductUpdateResponse(ProductQuickCreate):
+    code: str
+    price: float
+    cost: float
+    format: str
     dct: Optional[float]
     tax: Optional[float]
     stock: Optional[int]

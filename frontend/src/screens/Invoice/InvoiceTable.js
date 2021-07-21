@@ -11,10 +11,10 @@ import InfoBox from '../../components/InfoBox';
 import DataService from "../../services/data.service";
 import PatchedPagination from '../../components/PatchedPagination'
 import { useTranslation } from "react-i18next";
-import ReactToPrint, { useReactToPrint } from 'react-to-print';
-import InvoiceExample from '../../components/Invoice/InvoiceExample.js';
-import jsPDF from "jspdf";
-import "jspdf-autotable";
+import { parseISO, format } from 'date-fns';
+import InvoiceExample from '../../components/Invoice/InvoiceExample';
+import InvoiceReport from '../../components/Invoice/InvoiceReport';
+import InvoicePrint from '../../components/Invoice/InvoicePrint';
 
 const classes = (theme) => ({
   paper: {
@@ -101,13 +101,13 @@ const InvoiceTable = (props) => {
     DataService.getAll(endpoint)
       .then(response => {
         var tempData = response.data.items;
-        tempData.forEach(function (record) {
-          // var sumEach = 0.00
-          record.invoice_detail.forEach((detail) => {
-            record.total += detail.total
-          })
-          // tempData.total = sumEach; 
-        });
+        // tempData.forEach(function (record) {
+        //   // var sumEach = 0.00
+        //   record.invoice_detail.forEach((detail) => {
+        //     record.total += detail.total
+        //   })
+        //   // tempData.total = sumEach; 
+        // });
         setData(tempData)
         // console.log(tempData);
       })
@@ -199,8 +199,8 @@ const InvoiceTable = (props) => {
   };
 
   const openDialogBox = (id) => {
-    setDialogueTitle("Delete Record?")
-    setDialogueBody("Are you sure to delete Invoice Id: " + id)
+    setDialogueTitle(t("delete_record_question"))
+    setDialogueBody(t("sure_to_delete_record_question")+id)
     // console.log(dialogOpen, dialogueTitle, dialogueBody)
     setidToDelete(id)
     setDialogOpen(true)
@@ -258,10 +258,15 @@ const InvoiceTable = (props) => {
         tableRef={tableRef}
         columns={[
           { title: 'ID', field: 'id' },
-          { title: 'Date', field: 'date' },
+          { title: 'Date', field: 'date' , render: rowData => format(parseISO(rowData.date), 'dd/MM/yyyy') },
           { title: 'Invoice', field: 'invoice' },
+          { title: 'Due Date', field: 'due_date' , render: rowData => format(parseISO(rowData.due_date), 'dd/MM/yyyy') },
           { title: 'Client', field: 'client.name' },
-          { title: 'Total', field: 'total' },
+          { title: 'SubTotal', field: 'subtotal', render: rowData => rowData.subtotal.toFixed(2) },
+          { title: 'Dct %', field: 'dct' , render: rowData => rowData.dct.toFixed(2)},
+          { title: 'Tax %', field: 'tax' , render: rowData => rowData.tax.toFixed(2)},
+          { title: 'Total', field: 'total' , render: rowData => rowData.total.toFixed(2)},
+          { title: 'Collected', field: 'collected' , render: rowData => rowData.collected ? 'Yes' : 'No'}
         ]}
         // data={[
         //   { name: 'Mehmet', surname: 'Baran', birthYear: 1987, birthCity: 63 },
@@ -271,19 +276,21 @@ const InvoiceTable = (props) => {
         actions={[
           {
             icon: 'edit',
-            tooltip: 'Edit User',
+            tooltip: t("detail_edit_record_tip"),
             onClick: (event, rowData) => handleFormOpen(rowData.id)
           },
           {
             icon: 'delete',
-            tooltip: 'Delete User',
+            tooltip: t("detail_delete_record_tip"),
             onClick: (event, rowData) => openDialogBox(rowData.id)
           },
           {
             icon: 'print',
-            tooltip: 'Print Invoice',
-            onClick: (event, rowData) => openPrintBox(rowData)
+            tooltip: t("detail_print_record_tip"),
+            onClick: (event, rowData) => InvoicePrint(rowData)
+            // onClick: (event, rowData) => InvoiceReport(rowData)
           }
+          //add collect button
         ]}
         options={{
           actionsColumnIndex: -1,

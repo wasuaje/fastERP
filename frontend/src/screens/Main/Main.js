@@ -1,4 +1,4 @@
-import React,  { useState }  from 'react';
+import React,  { useState, useEffect }  from 'react';
 import PropTypes from 'prop-types';
 import {ThemeProvider, withStyles } from '@material-ui/core/styles';
 import { unstable_createMuiStrictModeTheme as createMuiTheme } from '@material-ui/core';
@@ -22,7 +22,6 @@ import ClientTable from '../Client/ClientTable';
 import InvoiceTable from '../Invoice/InvoiceTable';
 import { useTranslation } from "react-i18next";
 import i18n from "../../translations/i18n";
-
 
 
 function Copyright() {
@@ -178,14 +177,12 @@ const styles = {
   },
 };
 
+
 function Main(props) {
   const { classes } = props;
   const [language, setLanguage] = useState('es');
   const { t } = useTranslation();
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [ContentComponent, setContentComponent] = useState(<Authenticate /> );
-  const [headerTitle, setheaderTitle] = useState("");
-  const [categories, setCategories] = useState([
+  const categoryData = [
     {
       id: t("menu_process"),
       children: [
@@ -223,19 +220,25 @@ function Main(props) {
         { id:  t('menu_permissions'), icon:  <SettingsIcon /> , component: <ClientTable PaperProps={{ style: { width: drawerWidth } }}/>},        
       ],
     },
-  ])
+  ] 
   
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [ContentComponent, setContentComponent] = useState(<Authenticate /> );
+  const [headerTitle, setheaderTitle] = useState("");
+  const [categories, setCategories] = useState(categoryData)
+  
+
   const handleOnLanguageChangeClick=(e)=>{
-    e.preventDefault();
-    setLanguage(e.target.value);
-    i18n.changeLanguage(e.target.value);
+    // e.preventDefault();        
+    setLanguage(e.target.value);    
+    i18n.changeLanguage(e.target.value)    
+    setCategories([...categories])
   }
 
   function handleOptClick(id, childId){    
     let newCategories  = [
       ...categories
-    ];
-    
+    ];    
   
   setCategories( () => {
     //clean actives
@@ -285,6 +288,8 @@ function Main(props) {
                       categories={categories}
                       setCategories={setCategories}
                       handleOptClick={handleOptClick}
+                      setContentComponent={setContentComponent}                    
+                      setheaderTitle={setheaderTitle}                      
 
              />
           </Hidden>

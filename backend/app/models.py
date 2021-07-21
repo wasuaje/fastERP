@@ -15,26 +15,22 @@ from app.database import Base
 
 
 class Client(Base):
-    __tablename__ = "app_contact"
+    __tablename__ = "app_client"
 
     id = Column(Integer, primary_key=True, index=True)
     date = Column(Date, index=True)
-    name = Column(String(100))
-    age = Column(Integer, default=0)
-    gender = Column(String(1), nullable=True)
+    name = Column(String(100))    
+    cuit = Column(String(100), nullable=True)
     email = Column(String(100), nullable=True)
+    website = Column(String(100), nullable=True)
     phone = Column(String(50))
     address = Column(String(250), nullable=True)
     city = Column(String(50), nullable=True)
     state = Column(String(50), nullable=True)
-    zip_code = Column(String(10), nullable=True)
-    dob = Column(String(10), nullable=True)
-    driver_id = Column(String(20), nullable=True)
-    auth_area = Column(String(20), nullable=True)
-    auth_color = Column(String(20), nullable=True)
-    acceptance = Column(Integer, default=0)
+    zip_code = Column(String(10), nullable=True)    
     created_on = Column(DateTime, default=datetime.datetime.now())
 
+    collect = relationship("Collect", back_populates="client")
     invoice = relationship("Invoice", back_populates="client")
     event = relationship("Event", back_populates="client")
 
@@ -47,6 +43,7 @@ class Provider(Base):
     name = Column(String(100))
     cuit = Column(String(100), nullable=True)
     email = Column(String(100), nullable=True)
+    website = Column(String(100), nullable=True)
     phone = Column(String(50))
     address = Column(String(250), nullable=True)
     city = Column(String(50), nullable=True)
@@ -55,6 +52,7 @@ class Provider(Base):
     created_on = Column(DateTime, default=datetime.datetime.now())
 
     purchase = relationship("Purchase", back_populates="provider")
+    payment = relationship("Payment", back_populates="provider")
 
 
 class ProductCategory(Base):
@@ -70,7 +68,10 @@ class Product(Base):
     __tablename__ = "app_product"
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(100))
+    code = Column(String(10))
+    format = Column(String(25))
     price = Column(Float, default=0.00)
+    cost = Column(Float, default=0.00)
     dct = Column(Float, default=0.00)
     tax = Column(Float, default=0.00)
     stock = Column(Integer, default=0)
@@ -84,8 +85,8 @@ class Product(Base):
         "ProductCategory", back_populates="product_category")
 
 
-class Profesional(Base):
-    __tablename__ = "app_profesional"
+class Employee(Base):
+    __tablename__ = "app_employee"
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(100), nullable=True)
     gender = Column(String(1), nullable=True)
@@ -94,13 +95,16 @@ class Profesional(Base):
     created_on = Column(DateTime, default=datetime.datetime.now())
 
     invoice = relationship("Invoice",
-                           back_populates="profesional")
+                           back_populates="employee")
 
-    event = relationship("Event", back_populates="profesional")
+    purchase = relationship("Purchase",
+                           back_populates="employee")
+
+    event = relationship("Event", back_populates="employee")
 
 
 class Cash(Base):
-    __tablename__ = "app_caja"
+    __tablename__ = "app_cash"
 
     id = Column(Integer, primary_key=True, index=True)
     fecha = Column(Date, index=True)
@@ -116,18 +120,114 @@ class Cash(Base):
 
 
 class CashDetail(Base):
-    __tablename__ = "app_cajadetalle"
+    __tablename__ = "app_cash_detail"
 
     id = Column(Integer, primary_key=True, index=True)
     concepto = Column(String(100))
     monto = Column(Float, default=0.00)
-    caja_id = Column(Integer, ForeignKey("app_caja.id"))
+    caja_id = Column(Integer, ForeignKey("app_cash.id"))
 
     cash = relationship("Cash", back_populates="cash_detail")
 
 
+class PaymentMethod(Base):
+    __tablename__ = "app_payment_method"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(100))
+    created_on = Column(DateTime, default=datetime.datetime.now())
+
+    collect_detail = relationship("CollectDetail", back_populates="payment_method")
+    payment_detail = relationship("PaymentDetail", back_populates="payment_method")
+
+
+class Collect(Base):    #cobros a clientes
+    __tablename__ = "app_collect"
+    id = Column(Integer, primary_key=True, index=True)
+    date = Column(Date)
+    notes = Column(String(500), nullable=True)
+    client_id =  Column(Integer, ForeignKey("app_client.id"))
+    created_on = Column(DateTime, default=datetime.datetime.now())
+
+    collect_detail = relationship("CollectDetail", back_populates="collect")
+    client = relationship("Client", back_populates="collect")
+    invoice = relationship("Invoice", back_populates="collect")
+
+
+class CollectDetail(Base): #detalle de cobros a clientes
+    __tablename__ = "app_collect_detail"
+    id = Column(Integer, primary_key=True, index=True)    
+    amount = Column(Float, default=0.00)
+    description =  Column(String(150), nullable=True)
+    check =  Column(String(1000), nullable=True)
+
+    collect_id = Column(Integer, ForeignKey("app_collect.id"))
+    payment_method_id = Column(Integer, ForeignKey("app_payment_method.id"))
+        
+    collect = relationship("Collect", back_populates="collect_detail")
+    payment_method = relationship("PaymentMethod", back_populates="collect_detail")
+
+
+class Payment(Base):    #pago a proveedores
+    __tablename__ = "app_payment"
+    id = Column(Integer, primary_key=True, index=True)
+    date = Column(Date)
+    bank =  Column(String(50), nullable=True)
+    account =  Column(String(50), nullable=True)
+    notes = Column(String(500), nullable=True)    
+    created_on = Column(DateTime, default=datetime.datetime.now())
+    provider_id =  Column(Integer, ForeignKey("app_provider.id"))    
+
+    payment_detail = relationship("PaymentDetail", back_populates="payment")
+    provider = relationship("Provider", back_populates="payment")
+    purchase = relationship("Purchase", back_populates="payment")
+    
+
+class PaymentDetail(Base): #pago a proveedores
+    __tablename__ = "app_payment_detail"
+    id = Column(Integer, primary_key=True, index=True)    
+    amount = Column(Float, default=0.00)
+    description =  Column(String(150), nullable=True)
+    check =  Column(String(1000), nullable=True)
+    payment_id = Column(Integer, ForeignKey("app_payment.id"))
+    payment_method_id = Column(Integer, ForeignKey("app_payment_method.id"))
+        
+    payment = relationship("Payment", back_populates="payment_detail")
+    payment_method = relationship("PaymentMethod", back_populates="payment_detail")
+
+
+
+class Invoice(Base):
+    __tablename__ = "app_invoice"
+
+    id = Column(Integer, primary_key=True, index=True)
+    date = Column(Date)
+    due_date = Column(Date)
+    invoice = Column(String(20), nullable=True)
+    order = Column(String(20), nullable=True) 
+    subtotal = Column(Float, default=0.00)   
+    dct = Column(Float, default=0.00)
+    tax = Column(Float, default=0.00)
+    total = Column(Float, default=0.00)   
+    body_note = Column(String(500), nullable=True)
+    foot_note = Column(String(500), nullable=True)
+    created_on = Column(DateTime, default=datetime.datetime.now())
+    
+    collect_id = Column(Integer, ForeignKey("app_collect.id"), nullable=True)
+    client_id = Column(Integer, ForeignKey("app_client.id"))
+    employee_id = Column(Integer, ForeignKey("app_employee.id"))
+    
+    client = relationship("Client", back_populates="invoice")
+    invoice_detail = relationship("InvoiceDetail", back_populates="invoice")
+    collect = relationship("Collect", back_populates="invoice")
+    employee = relationship("Employee", back_populates="invoice")
+    
+    @hybrid_property
+    def collected(self):
+        return (1 if self.collect_id else 0)
+
+
 class InvoiceDetail(Base):
-    __tablename__ = "app_invoicedetail"
+    __tablename__ = "app_invoice_detail"
 
     id = Column(Integer, primary_key=True, index=True)
     qtty = Column(Integer, default=1)
@@ -142,45 +242,34 @@ class InvoiceDetail(Base):
         return self.qtty * self.price
 
 
-class Invoice(Base):
-    __tablename__ = "app_invoice"
-
-    id = Column(Integer, primary_key=True, index=True)
-    date = Column(Date)
-    invoice = Column(String(20), nullable=True)
-    order = Column(String(20), nullable=True)
-    payment_nro = Column(String(20), nullable=True)
-    payment_method = Column(String(20), nullable=True)
-    created_on = Column(DateTime, default=datetime.datetime.now())
-    contact_id = Column(Integer, ForeignKey("app_contact.id"))
-    profesional_id = Column(Integer, ForeignKey("app_profesional.id"))
-    client = relationship("Client", back_populates="invoice")
-    invoice_detail = relationship("InvoiceDetail", back_populates="invoice")
-    profesional = relationship("Profesional", back_populates="invoice")
-
-    @hybrid_property
-    def total(self):
-        return func.sum(self.invoice_detail.total)
-
-
 class Purchase(Base):
     __tablename__ = "app_purchase"
 
     id = Column(Integer, primary_key=True, index=True)
     date = Column(Date)
+    due_date = Column(Date)
     invoice = Column(String(20), nullable=True)
-    order = Column(String(20), nullable=True)
-    payment_nro = Column(String(20), nullable=True)
-    payment_method = Column(String(20), nullable=True)
+    order = Column(String(20), nullable=True)    
+    subtotal = Column(Float, default=0.00)   
+    dct = Column(Float, default=0.00)
+    tax = Column(Float, default=0.00)
+    total = Column(Float, default=0.00)   
+    body_note = Column(String(500), nullable=True)
+    foot_note = Column(String(500), nullable=True)
     created_on = Column(DateTime, default=datetime.datetime.now())
+
+    payment_id = Column(Integer, ForeignKey("app_payment.id"), nullable=True)
     provider_id = Column(Integer, ForeignKey("app_provider.id"))
+    employee_id = Column(Integer, ForeignKey("app_employee.id"))
 
     provider = relationship("Provider", back_populates="purchase")
+    payment = relationship("Payment", back_populates="purchase")
     purchase_detail = relationship("PurchaseDetail", back_populates="purchase")
+    employee = relationship("Employee", back_populates="purchase")
 
 
 class PurchaseDetail(Base):
-    __tablename__ = "app_purchasedetail"
+    __tablename__ = "app_purchase_detail"
 
     id = Column(Integer, primary_key=True, index=True)
     qtty = Column(Integer, default=1)
@@ -191,15 +280,9 @@ class PurchaseDetail(Base):
     purchase = relationship("Purchase", back_populates="purchase_detail")
     product = relationship("Product", back_populates="purchase_detail")
 
-
-class Speciality(Base):
-    __tablename__ = "app_speciality"
-
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String(150))
-    created_on = Column(DateTime, default=datetime.datetime.now())
-
-    event = relationship("Event", back_populates="speciality")
+    @hybrid_property
+    def total(self):
+        return self.qtty * self.price
 
 
 class Event(Base):
@@ -208,14 +291,13 @@ class Event(Base):
     id = Column(Integer, primary_key=True, index=True)
     start = Column(Date)
     end = Column(Date)
-    contact_id = Column(Integer, ForeignKey("app_contact.id"))
-    profesional_id = Column(Integer, ForeignKey("app_profesional.id"))
-    speciality_id = Column(Integer, ForeignKey("app_speciality.id"))
+    client_id = Column(Integer, ForeignKey("app_client.id"))
+    employee_id = Column(Integer, ForeignKey("app_employee.id"))
+    description = Column(String(50))    
     created_on = Column(DateTime, default=datetime.datetime.now())
 
     client = relationship("Client", back_populates="event")
-    profesional = relationship("Profesional", back_populates="event")
-    speciality = relationship("Speciality", back_populates="event")
+    employee = relationship("Employee", back_populates="event")    
 
 
 class User(Base):

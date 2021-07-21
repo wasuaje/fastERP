@@ -16,6 +16,9 @@ def get_product(db: Session, product_id: int):
 def create_product(db: Session, product: ProductCreate):
     db_product = ProductModel(name=product.name,
                               price=product.price,
+                              code=product.code,
+                              cost=product.cost,
+                              format=product.format,
                               dct=product.dct,
                               tax=product.tax,
                               stock=product.stock,
@@ -31,7 +34,10 @@ def update_product(db: Session, product: ProductSchema):
     product_data = db.query(ProductModel).filter(
         ProductModel.id == product.id).first()
     product_data.name = product.name
+    product_data.code = product.code
     product_data.price = product.price
+    product_data.cost = product.cost
+    product_data.format = product.format
     product_data.dct = product.dct
     product_data.tax = product.tax
     product_data.stock = product.stock

@@ -23,10 +23,13 @@ class InvoiceDelete(BaseModel):
 
 class InvoiceBase(BaseModel):
     date: datetime.date
+    due_date: datetime.date
     invoice: str
     order: Optional[str]
-    payment_nro: Optional[str]
-    payment_method: Optional[str]
+    body_note: Optional[str]
+    foot_note: Optional[str]    
+    dct: Optional[float]
+    tax: Optional[float]
     profesional_id: int
     contact_id: int
     created_on: Optional[datetime.datetime] = datetime.datetime.now()
@@ -37,9 +40,11 @@ class InvoiceCreate(InvoiceBase):
         orm_mode = True
         schema_extra = {"date": "2019-12-05T00:00:00",
                         "invoice": "FACT-001",
-                        "order": "ORD-001",
-                        "payment_nro": "PYM-001",
-                        "payment_method": "Efectivo",
+                        "order": "ORD-001",                        
+                        "dct": 5.00,
+                        "tax": 12.00,
+                        "body_note": "Long Detail level description or note",
+                        "foot_note": "Long foot level description or note",
                         "profesional_id": 25,
                         "contact_id": 12
                         }
@@ -52,9 +57,7 @@ class Invoice(InvoiceBase):
         orm_mode = True
         schema_extra = {"date": "2019-12-05T00:00:00",
                         "invoice": "FACT-001",
-                        "order": "ORD-001",
-                        "payment_nro": "PYM-001",
-                        "payment_method": "Efectivo",
+                        "order": "ORD-001",                        
                         "profesional_id": 25,
                         "contact_id": 12
                         }
@@ -63,10 +66,15 @@ class Invoice(InvoiceBase):
 class InvoiceResponse(BaseModel):
     id: int
     date: datetime.date
+    due_date: datetime.date
     invoice: str
     order: Optional[str]
-    payment_nro: Optional[str]
-    payment_method: Optional[str]
+    subtotal: Optional[float]        
+    dct: Optional[float]    
+    tax: Optional[float]
+    body_note: Optional[str]
+    foot_note: Optional[str]
+    collected: Optional[int]
     profesional: ProfesionalResponse
     client: ClientResponse    
     created_on: datetime.datetime
