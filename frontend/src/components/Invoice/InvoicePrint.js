@@ -1,4 +1,4 @@
-import jsPDFInvoiceTemplate, {OutputType} from "jspdf-invoice-template";
+import jsPDFInvoiceTemplate, {OutputType} from "./InvoicecTemplate";
 // Date Fns is used to format the dates we receive
 // from our API call
 import { format } from "date-fns";
@@ -55,15 +55,23 @@ const generateInvoicePrintPDF = invoice => {
         invTotalLabel: "Total:",
         invTotal: "145,250.50",
         invCurrency: "ALL",
-        row1: {
-            col1: 'VAT:',
-            col2: '20',
+        row2: {
+            col1: 'IVA: ( 10 %)',
+            col2: '200',
             col3: '%',
             style: {
                 fontSize: 10 //optional, default 12
             }
         },
-        row2: {
+        row3: {
+            col1: 'DCTO: (5%)',
+            col2: '50',
+            col3: '%',
+            style: {
+                fontSize: 10 //optional, default 12
+            }
+        },
+        row1: {
             col1: 'SubTotal:',
             col2: '116,199.90',
             col3: 'ALL',

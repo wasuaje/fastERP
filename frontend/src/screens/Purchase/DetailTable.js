@@ -40,7 +40,7 @@ const DetailForm = (props) => {
 	const base_url = 'api'
 	const productEndpoint = `${base_url}/product`
 	const getData = props.getData;
-	const { invoiceId, setInvoiceId } = props
+	const { purchaseId, setPurchaseId } = props
 	const [qtty, setQtty] = useState(1)
 	const [price, setPrice] = useState(0.00)
 	const openNoticeBox = props.openNoticeBox
@@ -70,10 +70,10 @@ const DetailForm = (props) => {
 	const addData = (values) => {
 		DataService.create(`${endpoint}/`, values)
 			.then(response => {
-				// openNoticeBox("Notice", "Invoice created successfully")   			
-				// setInvoiceId(response.data.id)
+				// openNoticeBox("Notice", "Purchase created successfully")   			
+				// setPurchaseId(response.data.id)
 				// setData(emptyData)
-				getData(invoiceId)
+				getData(purchaseId)
 			})
 			.catch(e => {
 				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)
@@ -87,19 +87,19 @@ const DetailForm = (props) => {
 			return false
 		}
 		let values = {
-			'invoice_id': invoiceId,
+			'purchase_id': purchaseId,
 			'product_id': productValue.id,
 			'qtty': qtty,
 			'price': price,
 		}
 		//  console.log(values)					
 		addData(values)
-		// if (invoiceId == 0) {
+		// if (purchaseId == 0) {
 		// 	addData(values)		
 		// 	// resetForm()		
 		// }
-		// if (invoiceId > 0 ) {			
-		// 	values.id = invoiceId
+		// if (purchaseId > 0 ) {			
+		// 	values.id = purchaseId
 		// 	// console.log(values)
 		// 	updateData(values)
 		// }
@@ -133,8 +133,8 @@ const DetailForm = (props) => {
 					}}
 
 					value={productValue ? productValue : ""}
-					renderInput={(params) => <TextField {...params} label={t("invoice_form_detail_lbl_product")} />}
-					disabled={invoiceId === 0 ? true : false}
+					renderInput={(params) => <TextField {...params} label={t("purchase_form_detail_lbl_product")} />}
+					disabled={purchaseId === 0 ? true : false}
 					getOptionSelected={(option, value) => option.value === value.value}
 
 
@@ -145,12 +145,12 @@ const DetailForm = (props) => {
 					margin="normal"
 					fullWidth
 					id="qtty"
-					label={t("invoice_form_detail_lbl_qtty")}
+					label={t("purchase_form_detail_lbl_qtty")}
 					name="qtty"
 					onChange={event => setQtty(event.target.value)}
 					value={qtty}
 					style={{ marginTop: '-1px' }}
-					disabled={invoiceId === 0 ? true : false}
+					disabled={purchaseId === 0 ? true : false}
 				/>
 			</Grid>
 			<Grid item xs={2}>
@@ -158,12 +158,12 @@ const DetailForm = (props) => {
 					margin="normal"
 					fullWidth
 					id="price"
-					label={t("invoice_form_detail_lbl_price")}
+					label={t("purchase_form_detail_lbl_price")}
 					name="price"
 					onChange={event => setPrice(event.target.value)}
 					value={price ? price : 0}
 					style={{ marginTop: '-1px' }}
-					disabled={invoiceId === 0 ? true : false}
+					disabled={purchaseId === 0 ? true : false}
 				/>
 			</Grid>
 			<Grid item xs={2}>
@@ -171,7 +171,7 @@ const DetailForm = (props) => {
 					margin="normal"
 					fullWidth
 					id="total"
-					label={t("invoice_form_detail_lbl_total")}
+					label={t("purchase_form_detail_lbl_total")}
 					name="total"
 					disabled
 					// onChange={event => { }}
@@ -189,14 +189,14 @@ const DetailForm = (props) => {
 }
 
 const base_url = 'api'
-const endpoint = `${base_url}/invoice-detail`
-const invoiceEndpoint = `${base_url}/invoice`
+const endpoint = `${base_url}/purchase-detail`
+const purchaseEndpoint = `${base_url}/purchase`
 
 
 const DetailTable = (props) => {	
 	const { t } = useTranslation();
 
-	const { invoiceId, setInvoiceId, dctValue, taxValue } = props	
+	const { purchaseId, setPurchaseId, dctValue, taxValue } = props	
 
 	const [detailSubTotal, setDetailSubTotal] = useState("0.00")
 
@@ -266,7 +266,7 @@ const DetailTable = (props) => {
 
 	const [detailData, setDetailData] = useState([]);
 	useEffect(() => {
-		getData(invoiceId)
+		getData(purchaseId)
 	}, []);
 
 	const getData = (id) => {
@@ -296,8 +296,8 @@ const DetailTable = (props) => {
 		var dataDelete = { 'id': id };
 		DataService.delete(endpoint, dataDelete)
 			.then(response => {
-				// openNoticeBox("Notice", "Invoice deleted successfully")   
-				getData(invoiceId)
+				// openNoticeBox("Notice", "Purchase deleted successfully")   
+				getData(purchaseId)
 			})
 			.catch(e => {
 				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)
@@ -323,10 +323,10 @@ const DetailTable = (props) => {
 				title="Detail"
 				columns={[
 					{ title: 'ID', field: 'id' },
-					{ title: t("invoice_form_detail_product"), field: 'product.name' },
-					{ title: t("invoice_form_detail_qtty"), field: 'qtty' },
-					{ title: t("invoice_form_detail_price"), field: 'price' },
-					{ title: t("invoice_form_detail_total"), field: 'total' }
+					{ title: t("purchase_form_detail_product"), field: 'product.name' },
+					{ title: t("purchase_form_detail_qtty"), field: 'qtty' },
+					{ title: t("purchase_form_detail_price"), field: 'price' },
+					{ title: t("purchase_form_detail_total"), field: 'total' }
 				]}
 				data={detailData}
 				actions={[
@@ -345,7 +345,7 @@ const DetailTable = (props) => {
 					Toolbar: props => (
 						<div style={{ backgroundColor: '#e8eaf5' }}>
 							<DetailForm
-								invoiceId={invoiceId}
+								purchaseId={purchaseId}
 								openNoticeBox={openNoticeBox}
 								getData={getData}
 							/>

@@ -40,34 +40,33 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const base_url = 'api'
-const endpoint = `${base_url}/invoice`
-const clientEndpoint = `${base_url}/client`
+const endpoint = `${base_url}/collect`
+const invoiceEndpoint = `${base_url}/invoice/`
 const profesionalEndpoint = `${base_url}/profesional`
 const DATE_FORMAT = 'yyyy-MM-dd';
 
-const InvoiceForm = React.forwardRef((props, ref) => {
+const CollectForm = React.forwardRef((props, ref) => {
 	const { t } = useTranslation();
 	const { idToUpdate } = props;
-	const [invoiceId, setInvoiceId] = useState(props.idToUpdate)
+	const [collectId, setCollectId] = useState(props.idToUpdate)
 	useEffect(() => {
 		let isActive = true;
 		return () => { isActive = false };
-	}, [invoiceId, setInvoiceId]);
-	const [selectedDate, setSelectedDate] = useState(new Date());
-	const [selectedDueDate, setSelectedDueDate] = useState(new Date());
+	}, [collectId, setCollectId]);
+	const [selectedDate, setSelectedDate] = useState(new Date());	
 
-	// Getting Client data only once at the beggining
-	const [clientData, setClientData] = useState([]);
+	// Getting Invoice data only once at the beggining
+	const [invoiceData, setInvoiceData] = useState([]);
 	useEffect(() => {
 
-		retrieveClientData()
+		retrieveInvoiceData()
 	}, []); // Those ARE connectec
 
-	const retrieveClientData = () => {
-		DataService.getAll(clientEndpoint)
+	const retrieveInvoiceData = () => {
+		DataService.getAll(invoiceEndpoint)
 			.then(response => {
-				setClientData(response.data)
-				// console.log(response.data);
+				setInvoiceData(response.data)
+				console.log(response.data);
 			})
 			.catch(e => {
 				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)
@@ -75,10 +74,7 @@ const InvoiceForm = React.forwardRef((props, ref) => {
 	}
 
 
-	const [bodyNoteValue,setBodyNoteValue] = useState("")
-	const [footNoteValue, setFootNoteValue] = useState("")
-	const [dctValue, setDctValue] = useState("")
-	const [taxValue, setTaxValue] = useState("")
+	const [descriptionValue,setDescriptionValue] = useState("")	
 
 	// Getting profesional data only once at the beggining
 	const [profesionalData, setProfesionalData] = useState([]);
@@ -98,12 +94,10 @@ const InvoiceForm = React.forwardRef((props, ref) => {
 			});
 	}
 
-	//client combobox values
-	const [clientValue, setClientValue] = React.useState(clientData[0]);
-	const [clientInputValue, setClientInputValue] = React.useState('');
-	const [profesionalValue, setProfesionalValue] = React.useState(profesionalData[0]);
-	const [profesionalInputValue, setProfesionalInputValue] = React.useState('');
-	const [invoiceValue, setInvoiceValue] = React.useState("");
+	//invoice combobox values
+	const [invoiceValue, setInvoiceValue] = React.useState(invoiceData[0]);
+	const [invoiceInputValue, setInvoiceInputValue] = React.useState('');	
+	const [totalValue, setTotalValue] = React.useState(0.00);
 
 	// INFO NOTIFICATION VARS
 	const [infoOpen, setInfoOpen] = useState(false);
@@ -156,18 +150,12 @@ const InvoiceForm = React.forwardRef((props, ref) => {
 		DataService.get(id, endpoint)
 			.then(response => {
 				// console.log("get data",response.data)		
-				setInvoiceId(response.data.id)
-				setInvoiceValue(response.data.invoice)		
-				setSelectedDate(parseISO(response.data.date))
-				setSelectedDueDate(parseISO(response.data.due_date))
-				setClientInputValue(response.data.client.name)
-				setClientValue(response.data.client)
-				setProfesionalInputValue(response.data.employee.name)
-				setProfesionalValue(response.data.employee)
-				setBodyNoteValue(response.data.body_note)
-				setFootNoteValue(response.data.foot_note)
-				setDctValue(response.data.dct)
-				setTaxValue(response.data.tax)
+				setCollectId(response.data.id)
+				setTotalValue(response.data.total)		
+				setSelectedDate(parseISO(response.data.date))				
+				setInvoiceInputValue(response.data.invoice)
+				setInvoiceValue(response.data.invoice)				
+				setDescriptionValue(response.data.description)				
 			})
 			.catch(e => {
 				console.log(e)
@@ -184,7 +172,7 @@ const InvoiceForm = React.forwardRef((props, ref) => {
 	const updateData = (values) => {
 		DataService.update(endpoint, values)
 			.then(response => {
-				openNoticeBox("Notice", t("record_updated_successfully", {"table": t("invoice_table_title")}))
+				openNoticeBox("Notice", t("record_updated_successfully", {"table": t("collect_table_title")}))
 			})
 			.catch(e => {
 				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)
@@ -194,8 +182,8 @@ const InvoiceForm = React.forwardRef((props, ref) => {
 	const addData = (values) => {
 		DataService.create(`${endpoint}/`, values)
 			.then(response => {
-				openNoticeBox("Notice", t("record_created_successfully", {"table": t("invoice_table_title")}))
-				setInvoiceId(response.data.id)				
+				openNoticeBox("Notice", t("record_created_successfully", {"table": t("collect_table_title")}))
+				setCollectId(response.data.id)				
 			})
 			.catch(e => {
 				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)
@@ -205,24 +193,17 @@ const InvoiceForm = React.forwardRef((props, ref) => {
 	const submitForm = (event) => {
 		event.preventDefault();
 		var newDate,newDueDate = ""
-		newDate = format(selectedDate, DATE_FORMAT)
-		newDueDate = format(selectedDueDate, DATE_FORMAT)
+		newDate = format(selectedDate, DATE_FORMAT)		
 		let values = {
-			'client_id': clientValue.id,
-			'date': newDate,
-			'due_date': newDueDate,
-			'employee_id': profesionalValue.id,
-			'invoice': `FACT-${invoiceValue.replace('FACT-', '')}`,
-			'dct': dctValue,
-			'tax': taxValue,
-			'body_note': bodyNoteValue,
-			'foot_note': footNoteValue
+			'invoice_id': invoiceValue.id,
+			'date': newDate,						
+			'description': descriptionValue			
 		}
-		if (invoiceId === 0) {
+		if (collectId === 0) {
 			addData(values)			
 		}
-		if (invoiceId > 0) {
-			values.id = invoiceId
+		if (collectId > 0) {
+			values.id = collectId
 			// console.log(values)
 			updateData(values)
 		}
@@ -255,33 +236,23 @@ const InvoiceForm = React.forwardRef((props, ref) => {
 				<Grid container spacing={2}>
 					<Grid item xs={4}>
 						<Typography variant="h4" component="h4">
-							{t("invoice_form_invoice_id")}: {invoiceId ? invoiceId : 0}
+							{t("collect_form_collect_id")}: {collectId ? collectId : 0}
 						</Typography>
-						<TextField
-							variant="outlined"
-							margin="normal"
-							fullWidth
-							id="invoice"
-							label={t("invoice_form_lbl_invoice_invoice")}
-							name="invoice"
-							onChange={event => setInvoiceValue(event.target.value)}
-							value={invoiceValue}
-						/>
 						<Autocomplete
-							id="client"
+							id="invoice"
 							// value={value}
-							options={clientData}
-							getOptionLabel={(option) => option.name ? option.name : "-"}
+							options={invoiceData}
+							getOptionLabel={(option) => option.invoice ? option.invoice : "-"}
 							onChange={(event, newValue) => {
-								setClientValue(newValue);
+								setInvoiceValue(newValue);
 							}}
-							inputValue={clientInputValue}
+							inputValue={invoiceInputValue}
 							onInputChange={(event, newInputValue) => {
-								setClientInputValue(newInputValue);
+								setInvoiceInputValue(newInputValue);
 							}}
 
-							value={clientValue ? clientValue : ""}
-							renderInput={(params) => <TextField {...params} label={t("invoice_form_lbl_invoice_client")} variant="outlined" />}
+							value={invoiceValue ? invoiceValue : ""}
+							renderInput={(params) => <TextField {...params} label={t("collect_form_lbl_collect_invoice")} variant="outlined" />}
 							getOptionSelected={(option, value) => option.value === value.value}
 						/>
 						<MuiPickersUtilsProvider utils={DateFnsUtils}>
@@ -298,98 +269,37 @@ const InvoiceForm = React.forwardRef((props, ref) => {
 								variant="inline"
 								inputVariant="outlined"
 								style={{ marginTop: '5px' }}
-							/>
-							<KeyboardDatePicker
-								clearable="true"
-								value={selectedDueDate}
-								placeholder="2021-07-07"
-								onChange={dueDate => setSelectedDueDate(dueDate)}
-								// minDate={new Date()}
-								format={DATE_FORMAT}
-								autoOk
-								name="due_date"
-								id="due_date"
-								variant="inline"
-								inputVariant="outlined"
-								style={{ marginTop: '5px' }}
-							/>
-						</MuiPickersUtilsProvider>
-						<Autocomplete
-							id="profesional"
-							label={t("invoice_form_lbl_invoice_employee")}
-							name="profesional"
-							// value={value}
-							getOptionLabel={(option) => option.name ? option.name : "-"}
-							onChange={(event, newValue) => {
-								setProfesionalValue(newValue);
-							}}
-							inputValue={profesionalInputValue}
-							onInputChange={(event, newInputValue) => {
-								setProfesionalInputValue(newInputValue);
-							}}
-							options={profesionalData}
-							value={profesionalValue ? profesionalValue : ""}
-							renderInput={(params) => <TextField {...params} label={t("invoice_form_lbl_invoice_employee")} variant="outlined" />}
-							style={{ marginTop: '7px' }}
-							getOptionSelected={(option, value) => option.value === value.value}
-
-
-						/>					
+							/>							
+						</MuiPickersUtilsProvider>						
 						<TextField
 							variant="outlined"
 							margin="normal"
 							fullWidth
-							id="body_note"
-							label={t("invoice_form_lbl_invoice_body_note")}
-							name="body_note"
+							id="description"
+							label={t("collect_form_lbl_collect_description")}
+							name="description"
 							multiline
           					maxRows={4}
-							onChange={event => setBodyNoteValue(event.target.value)}
-							value={bodyNoteValue}
+							onChange={event => setDescriptionValue(event.target.value)}
+							value={descriptionValue}
 							style={{ marginTop: '5px' }}
-						/>
+						/>						
 						<TextField
 							variant="outlined"
 							margin="normal"
 							fullWidth
-							id="foot_note"
-							label={t("invoice_form_lbl_invoice_foot_note")}
-							name="foot_note"
-							multiline
-          					maxRows={4}
-							onChange={event => setFootNoteValue(event.target.value)}
-							value={footNoteValue}
-							style={{ marginTop: '-2px' }}
-						/>
-						<TextField
-							variant="outlined"
-							margin="normal"
-							fullWidth
-							id="dct"
-							label={t("invoice_form_lbl_invoice_discount")}
-							name="dct"
-							onChange={event => setDctValue(event.target.value)}
-							value={dctValue}
-							style={{ marginTop: '-2px' }}
-						/>
-						<TextField
-							variant="outlined"
-							margin="normal"
-							fullWidth
-							id="tax"
-							label={t("invoice_form_lbl_invoice_tax")}
-							name="tax"
-							onChange={event => setTaxValue(event.target.value)}
-							value={taxValue}
-							style={{ marginTop: '-2px' }}
+							id="total"
+							label={t("collect_form_lbl_collect_total")}
+							name="total"
+							onChange={event => setTotalValue(event.target.value)}
+							value={totalValue}
+							disabled={true}
 						/>
 					</Grid>
 					<Grid item xs={8}>
 						<DetailTable
-							invoiceId={invoiceId}
-							setInvoiceId={setInvoiceId}
-							dctValue={dctValue}
-							taxValue={taxValue}
+							collectId={collectId}
+							setCollectId={setCollectId}						
 						/>
 					</Grid>
 					<Grid item xs={12}>
@@ -400,7 +310,7 @@ const InvoiceForm = React.forwardRef((props, ref) => {
 							color="primary"
 							className={classes.submit}
 						>
-							{invoiceId === 0 ? t("save_form_button") : t("update_form_button")}
+							{collectId === 0 ? t("save_form_button") : t("update_form_button")}
 
 						</Button>
 					</Grid>
@@ -414,5 +324,5 @@ const InvoiceForm = React.forwardRef((props, ref) => {
 	)
 })
 
-export default InvoiceForm;
+export default CollectForm;
     // ReactDOM.render(<WithMaterialUI />, document.getElementById('root'));

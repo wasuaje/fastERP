@@ -141,8 +141,9 @@ theme = {
     },
     MuiAvatar: {
       root: {
-        width: 32,
-        height: 32,
+        width: 80,
+        height: 80,        
+        marginRight: theme.spacing(1),        
       },
     },
   },

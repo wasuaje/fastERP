@@ -6,7 +6,7 @@ from ..schemas.invoice import Invoice, InvoiceCreate, InvoiceDelete, InvoiceResp
 from ..schemas.auth import User
 from ..crud.invoice import get_invoicees, create_invoice
 from ..crud.invoice import get_invoice, delete_invoice, update_invoice
-from fastapi_pagination import paginate, Page
+# from fastapi_pagination import paginate, Page
 
 
 router = APIRouter(dependencies=[Depends(get_current_active_user),
@@ -15,12 +15,12 @@ router = APIRouter(dependencies=[Depends(get_current_active_user),
 #
 # Facturacion - Invoice
 #
-@router.get("/api/invoice/", response_model=Page[InvoiceResponse], tags=["Invoice"])
+@router.get("/api/invoice/", response_model=List[InvoiceResponse], tags=["Invoice"])
 def list_invoice(skip: int = 0, limit: int = 100,
                  db: Session = Depends(get_db)):
     invoice = get_invoicees(db, skip=skip, limit=limit)
-    # return invoice
-    return paginate(invoice)
+    return invoice
+    # return paginate(invoice)
 
 
 

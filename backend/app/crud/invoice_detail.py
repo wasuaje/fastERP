@@ -43,7 +43,6 @@ def get_invoice_detail(db: Session, invoice_id: int):
         InvoiceDetailModel.invoice_id == invoice_id).all()
 
 
-# TODO: Decrease stock by invoice.detail.qtty in product
 def create_invoice_detail(db: Session, invoice_detail: InvoiceDetailSchema):
     db_invoice_detail = InvoiceDetailModel(qtty=invoice_detail.qtty,
                                            price=invoice_detail.price,

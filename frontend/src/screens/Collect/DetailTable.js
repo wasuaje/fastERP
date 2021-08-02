@@ -38,42 +38,66 @@ const useStyles = makeStyles((theme) => ({
 
 const DetailForm = (props) => {
 	const base_url = 'api'
-	const productEndpoint = `${base_url}/product`
+	const paymentMethodEndpoint = `${base_url}/payment-method`
+	const bankEndpoint = `${base_url}/bank`
 	const getData = props.getData;
-	const { invoiceId, setInvoiceId } = props
-	const [qtty, setQtty] = useState(1)
-	const [price, setPrice] = useState(0.00)
+	const { collectId, setCollectId } = props	
+	const [total, setTotal] = useState(0.00)
 	const openNoticeBox = props.openNoticeBox
 	const { t } = useTranslation();
 
-	const [productData, setProductData] = useState([]);
+	const [bankData, setBankData] = useState([]);
 	useEffect(() => {
 
-		retrieveProductData()
+		retrieveBankData()
 	}, []);
 
-	const retrieveProductData = () => {
-		DataService.getAll(productEndpoint)
+	const retrieveBankData = () => {
+		DataService.getAll(bankEndpoint)
 			.then(response => {
-				setProductData(response.data)
-				// console.log("product",response.data);
+				setBankData(response.data)
+				// console.log("bank",response.data);
 			})
 			.catch(e => {
 				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)
 			});
 	}
 
-	const [productValue, setProductValue] = React.useState(productData[0]);
-	const [productInputValue, setProductInputValue] = React.useState('');
+	const [paymentMethodData, setPaymentMethodData] = useState([]);
+	useEffect(() => {
 
+		retrievePaymentMethodData()
+	}, []);
+
+	const retrievePaymentMethodData = () => {
+		DataService.getAll(paymentMethodEndpoint)
+			.then(response => {
+				setPaymentMethodData(response.data)
+				// console.log("paymentMethod",response.data);
+			})
+			.catch(e => {
+				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)
+			});
+	}
+
+
+	const [amount, setAmount] = React.useState(0);
+	const [reference, setReference] = React.useState("");	
+	
+	const [bankValue, setBankValue] = React.useState(bankData[0]);
+	const [bankInputValue, setBankInputValue] = React.useState('');
+
+
+	const [paymentMethodValue, setPaymentMethodValue] = React.useState(paymentMethodData[0]);
+	const [paymentMethodInputValue, setPaymentMethodInputValue] = React.useState('');
 
 	const addData = (values) => {
 		DataService.create(`${endpoint}/`, values)
 			.then(response => {
-				// openNoticeBox("Notice", "Invoice created successfully")   			
-				// setInvoiceId(response.data.id)
+				// openNoticeBox("Notice", "Collect created successfully")   			
+				// setCollectId(response.data.id)
 				// setData(emptyData)
-				getData(invoiceId)
+				getData(collectId)
 			})
 			.catch(e => {
 				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)
@@ -82,24 +106,25 @@ const DetailForm = (props) => {
 
 	const AddDetail = (event) => {
 		event.preventDefault();
-		if (typeof productValue === 'undefined') {
-			openNoticeBox("Error",  t("should_pick_a_product"))
+		if (typeof paymentMethodValue === 'undefined') {
+			openNoticeBox("Error",  t("should_pick_a_paymentMethod"))
 			return false
 		}
 		let values = {
-			'invoice_id': invoiceId,
-			'product_id': productValue.id,
-			'qtty': qtty,
-			'price': price,
+			'collect_id': collectId,
+			'payment_method_id': paymentMethodValue.id,			
+			'reference': reference,
+			'amount': amount,
+			'bank_id': bankValue.id
 		}
 		//  console.log(values)					
 		addData(values)
-		// if (invoiceId == 0) {
+		// if (collectId == 0) {
 		// 	addData(values)		
 		// 	// resetForm()		
 		// }
-		// if (invoiceId > 0 ) {			
-		// 	values.id = invoiceId
+		// if (collectId > 0 ) {			
+		// 	values.id = collectId
 		// 	// console.log(values)
 		// 	updateData(values)
 		// }
@@ -118,67 +143,74 @@ const DetailForm = (props) => {
 			</Grid>
 			<Grid item xs={2}>
 				<Autocomplete
-					id="product"
+					id="paymentMethod"
 					// value={value}
-					options={productData}
+					options={paymentMethodData}
 					getOptionLabel={(option) => option.name ? option.name : "-"}
 					onChange={(event, newValue) => {
-						setProductValue(newValue);
-						setPrice(newValue.price)
+						setPaymentMethodValue(newValue);
+						setTotal(newValue.total)
 					}}
-					inputValue={productInputValue}
+					inputValue={paymentMethodInputValue}
 					onInputChange={(event, newInputValue) => {
-						setProductInputValue(newInputValue);
-						setPrice(newInputValue.price)
+						setPaymentMethodInputValue(newInputValue);
+						setTotal(newInputValue.total)
 					}}
 
-					value={productValue ? productValue : ""}
-					renderInput={(params) => <TextField {...params} label={t("invoice_form_detail_lbl_product")} />}
-					disabled={invoiceId === 0 ? true : false}
+					value={paymentMethodValue ? paymentMethodValue : ""}
+					renderInput={(params) => <TextField {...params} label={t("collect_form_detail_lbl_paymentMethod")} />}
+					disabled={collectId === 0 ? true : false}
 					getOptionSelected={(option, value) => option.value === value.value}
+				/>				
+			</Grid>
+			<Grid item xs={2}>
+				<Autocomplete
+					id="bank"
+					// value={value}
+					options={bankData}
+					getOptionLabel={(option) => option.name ? option.name : "-"}
+					onChange={(event, newValue) => {
+						setBankValue(newValue);
+						setTotal(newValue.total)
+					}}
+					inputValue={bankInputValue}
+					onInputChange={(event, newInputValue) => {
+						setBankInputValue(newInputValue);
+						setTotal(newInputValue.total)
+					}}
 
-
+					value={bankValue ? bankValue : ""}
+					renderInput={(params) => <TextField {...params} label={t("collect_form_detail_lbl_bank")} />}
+					disabled={collectId === 0 ? true : false}
+					getOptionSelected={(option, value) => option.value === value.value}
+				/>				
+			</Grid>			
+			<Grid item xs={2}>
+				<TextField
+					margin="normal"
+					fullWidth
+					id="amount"
+					label={t("collect_form_detail_lbl_amount")}
+					name="amount"
+					onChange={event => setAmount(event.target.value)}
+					value={amount}
+					style={{ marginTop: '-1px' }}
+					disabled={collectId === 0 ? true : false}
 				/>
 			</Grid>
 			<Grid item xs={2}>
 				<TextField
 					margin="normal"
 					fullWidth
-					id="qtty"
-					label={t("invoice_form_detail_lbl_qtty")}
-					name="qtty"
-					onChange={event => setQtty(event.target.value)}
-					value={qtty}
+					id="reference"
+					label={t("collect_form_detail_lbl_reference")}
+					name="reference"
+					onChange={event => setReference(event.target.value)}
+					value={reference ? reference : ""}
 					style={{ marginTop: '-1px' }}
-					disabled={invoiceId === 0 ? true : false}
+					disabled={collectId === 0 ? true : false}
 				/>
-			</Grid>
-			<Grid item xs={2}>
-				<TextField
-					margin="normal"
-					fullWidth
-					id="price"
-					label={t("invoice_form_detail_lbl_price")}
-					name="price"
-					onChange={event => setPrice(event.target.value)}
-					value={price ? price : 0}
-					style={{ marginTop: '-1px' }}
-					disabled={invoiceId === 0 ? true : false}
-				/>
-			</Grid>
-			<Grid item xs={2}>
-				<TextField
-					margin="normal"
-					fullWidth
-					id="total"
-					label={t("invoice_form_detail_lbl_total")}
-					name="total"
-					disabled
-					// onChange={event => { }}
-					value={price * qtty ? price * qtty : 0}
-					style={{ marginTop: '-1px' }}
-				/>
-			</Grid>
+			</Grid>			
 			<Grid item xs={2}>
 				<Fab color="default" size="small" aria-label="add" onClick={AddDetail} style={{ marginTop: '-5px' }}  >
 					<AddIcon />
@@ -189,14 +221,14 @@ const DetailForm = (props) => {
 }
 
 const base_url = 'api'
-const endpoint = `${base_url}/invoice-detail`
-const invoiceEndpoint = `${base_url}/invoice`
+const endpoint = `${base_url}/collect-detail`
+const collectEndpoint = `${base_url}/collect`
 
 
 const DetailTable = (props) => {	
 	const { t } = useTranslation();
 
-	const { invoiceId, setInvoiceId, dctValue, taxValue } = props	
+	const { collectId, setCollectId, dctValue, taxValue } = props	
 
 	const [detailSubTotal, setDetailSubTotal] = useState("0.00")
 
@@ -266,7 +298,7 @@ const DetailTable = (props) => {
 
 	const [detailData, setDetailData] = useState([]);
 	useEffect(() => {
-		getData(invoiceId)
+		getData(collectId)
 	}, []);
 
 	const getData = (id) => {
@@ -296,8 +328,8 @@ const DetailTable = (props) => {
 		var dataDelete = { 'id': id };
 		DataService.delete(endpoint, dataDelete)
 			.then(response => {
-				// openNoticeBox("Notice", "Invoice deleted successfully")   
-				getData(invoiceId)
+				// openNoticeBox("Notice", "Collect deleted successfully")   
+				getData(collectId)
 			})
 			.catch(e => {
 				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)
@@ -323,10 +355,10 @@ const DetailTable = (props) => {
 				title="Detail"
 				columns={[
 					{ title: 'ID', field: 'id' },
-					{ title: t("invoice_form_detail_product"), field: 'product.name' },
-					{ title: t("invoice_form_detail_qtty"), field: 'qtty' },
-					{ title: t("invoice_form_detail_price"), field: 'price' },
-					{ title: t("invoice_form_detail_total"), field: 'total' }
+					{ title: t("collect_form_detail_payment_method"), field: 'payment_method.name' },
+					{ title: t("collect_form_detail_bank"), field: 'bank.name' },
+					{ title: t("collect_form_detail_amount"), field: 'amount' },
+					{ title: t("collect_form_detail_reference"), field: 'reference' }					
 				]}
 				data={detailData}
 				actions={[
@@ -345,7 +377,7 @@ const DetailTable = (props) => {
 					Toolbar: props => (
 						<div style={{ backgroundColor: '#e8eaf5' }}>
 							<DetailForm
-								invoiceId={invoiceId}
+								collectId={collectId}
 								openNoticeBox={openNoticeBox}
 								getData={getData}
 							/>

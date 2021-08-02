@@ -1,6 +1,7 @@
+from app.schemas.collect import CollectCreate
 from sqlalchemy.orm import Session
 import sqlalchemy as sa
-from ..models import Invoice as InvoiceModel, InvoiceDetail as InvoiceDetailModel
+from ..models import Collect, Invoice as InvoiceModel, InvoiceDetail as InvoiceDetailModel
 from ..schemas.invoice import InvoiceCreate, Invoice, InvoiceDelete
 from .invoice_detail import update_invoice as refresh_invoice
 
@@ -10,7 +11,8 @@ def get_invoice(db: Session, invoice_id: int):
 
 
 def get_invoicees(db: Session, skip: int = 0, limit: int = 100):
-    query = db.query(InvoiceModel).offset(skip).limit(limit).all()
+    query = db.query(InvoiceModel).all()
+    # print(str(query))
     return query
 
 
@@ -19,8 +21,8 @@ def create_invoice(db: Session, invoice: InvoiceCreate):
                               due_date=invoice.due_date,
                               invoice=invoice.invoice,
                               order=invoice.order,                              
-                              contact_id=invoice.contact_id,
-                              profesional_id=invoice.profesional_id,                              
+                              client_id=invoice.client_id,
+                              employee_id=invoice.employee_id,                              
                               dct=invoice.dct,
                               tax=invoice.tax,                              
                               body_note=invoice.body_note,
@@ -43,8 +45,8 @@ def update_invoice(db: Session, invoice: InvoiceModel):
     invoice_data.foot_note = invoice.foot_note
     invoice_data.dct = invoice.dct
     invoice_data.tax = invoice.tax
-    invoice_data.contact_id = invoice.contact_id
-    invoice_data.profesional_id=invoice.profesional_id
+    invoice_data.client_id = invoice.client_id
+    invoice_data.employee_id=invoice.employee_id
     db.commit()
     db.refresh(invoice_data)
     refresh_invoice(db, invoice_data.id)

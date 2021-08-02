@@ -13,6 +13,7 @@ from ..crud.purchase_detail import get_purchase_detail
 router = APIRouter(dependencies=[Depends(get_current_active_user),
                                  Depends(get_user_permissions)])
 
+
 #
 # CAjaDetalle - PurchaseDetail
 #
@@ -62,11 +63,11 @@ def delete_purchase_details(purchase_detail: PurchaseDetailDelete,
     return db_purchase_detail
 
 
-@router.get("/api/purchase-detail/{purchase_detail_id}", response_model=PurchaseDetailResponse, tags=["PurchaseDetail"])
-def get_a_purchase_detail(purchase_detail_id: int, db: Session = Depends(get_db),
+@router.get("/api/purchase-detail/{purchase_id}", response_model=List[PurchaseDetailResponse], tags=["PurchaseDetail"])
+def get_a_purchase_detail(purchase_id: int, db: Session = Depends(get_db),
                           current_user: User = Depends(get_current_active_user)):
     db_purchase_detail = get_purchase_detail(
-        db, purchase_detail_id=purchase_detail_id)
+        db, purchase_id=purchase_id)
     if db_purchase_detail is None:
         raise HTTPException(status_code=404, detail="PurchaseDetail not found")
     return db_purchase_detail

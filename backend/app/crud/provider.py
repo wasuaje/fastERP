@@ -24,7 +24,7 @@ def create_provider(db: Session, provider: ProviderSchema):
                                 address=provider.address,
                                 city=provider.city,
                                 state=provider.state,
-                                zip_code=provider.zip_codes)
+                                zip_code=provider.zip_code)
     db.add(db_provider)
     db.commit()
     return db_provider

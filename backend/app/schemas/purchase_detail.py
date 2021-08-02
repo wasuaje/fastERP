@@ -55,6 +55,7 @@ class PurchaseDetailResponse(Purchase):
     qtty: int
     price: float
     purchase_id: int
+    total: float
     product: ProductResponse    
 
     class Config:

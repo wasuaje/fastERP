@@ -11,9 +11,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from .routers import client, auth, cash, product, event
 from .routers import profesional, cash_detail, invoice, invoice_detail
 from .routers import product_category, provider, purchase, purchase_detail
-from .routers import permission
+from .routers import permission, payment_method, configuration, collect
+from .routers import collect_detail, bank
 from .dependencies import get_current_active_user, get_user_permissions
-from fastapi_pagination import  add_pagination
+# from fastapi_pagination import  add_pagination
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -50,9 +51,14 @@ app.include_router(invoice.router)
 app.include_router(invoice_detail.router)
 app.include_router(purchase.router)
 app.include_router(purchase_detail.router)
+app.include_router(payment_method.router)
+app.include_router(collect.router)
+app.include_router(collect_detail.router)
+app.include_router(bank.router)
+app.include_router(configuration.router)
 app.include_router(event.router)
 app.include_router(auth.router)
 app.include_router(permission.router)
 
 
-add_pagination(app)
+# add_pagination(app)

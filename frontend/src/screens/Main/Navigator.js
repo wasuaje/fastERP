@@ -4,6 +4,7 @@ import clsx from 'clsx';
 import { withStyles } from '@material-ui/core/styles';
 import Divider from '@material-ui/core/Divider';
 import Drawer from '@material-ui/core/Drawer';
+import Avatar from '@material-ui/core/Avatar'; 
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
@@ -24,13 +25,18 @@ import PhonelinkSetupIcon from '@material-ui/icons/PhonelinkSetup';
 import SupervisorAccountIcon from '@material-ui/icons/SupervisorAccount';
 import PostAddIcon from '@material-ui/icons/PostAdd';
 
+import DataService from "../../services/data.service";
+
 import Authenticate from '../Authenticate/Authenticate';
 import { Receipt, Shop } from '@material-ui/icons';
 import InvoiceTable from '../Invoice/InvoiceTable';
 import ProductCategoryTable from '../ProductCategory/ProductCategoryTable';
 import ProductTable from '../Product/ProductTable';
 import ClientTable from '../Client/ClientTable';
+import PurchaseTable from '../Purchase/PurchaseTable';
 import ProviderTable from '../Provider/ProviderTable';
+import PaymentMethod from '../PaymentMethod/PaymentMethodTable';
+import CollectTable from '../Collect/CollectTable';
 
 const styles = (theme) => ({
   categoryHeader: {
@@ -70,7 +76,7 @@ const styles = (theme) => ({
   },
   divider: {
     marginTop: theme.spacing(2),
-  },
+  },  
 });
 
 const ChildItem = (props) => {
@@ -98,10 +104,36 @@ const ChildItem = (props) => {
   )
 }
 
+const base_url = 'api'
+const endpoint = `${base_url}/configuration`
+
 function Navigator(props) {
   const { classes, categories, setCategories, handleOptClick, setCategoriesNew, setContentComponent, setheaderTitle, ...other } = props;
   const { t } = useTranslation();
 
+  	// Getting config data only once at the beggining
+	const [configData, setConfigData] = useState({});
+	useEffect(() => {
+
+		retrieveConfigData()
+	}, []); 
+
+	const retrieveConfigData = () => {
+		DataService.getAll(endpoint)
+			.then(response => {
+        let configTemp = {};
+        response.data.forEach(cfg => {
+          configTemp[cfg.config_name] = cfg.config_value          
+        });
+
+				setConfigData(configTemp)
+				// console.log(configTemp);      
+			})
+			.catch(e => {
+        console.log(e)
+				alert(`Error - Code: ${e.response.status} Message: ${e.response.statusText}`)
+			});
+	}
 
   // newCategories[0].children[3].active=true
 
@@ -111,9 +143,11 @@ function Navigator(props) {
   return (
     <Drawer variant="permanent" {...other}>
       <List disablePadding>
-        <ListItem className={clsx(classes.firebase, classes.item, classes.itemCategory)}>
-          Paperbase
+        <ListItem className={clsx(classes.firebase, classes.item, classes.itemCategory)}>          
+          <Avatar alt="" src={configData.company_logo_url} className={styles.large} />
+          {configData.company_name}
         </ListItem>
+        
         <ListItem className={clsx(classes.item, classes.itemCategory)}>
           <ListItemIcon className={classes.itemIcon}>
             <HomeIcon />
@@ -157,6 +191,15 @@ function Navigator(props) {
           classes={classes}
         />
         <ChildItem
+          key="collect"
+          setContentComponent={setContentComponent}
+          setheaderTitle={setheaderTitle}
+          icon={<Receipt />}
+          component={<CollectTable />}
+          title={t("menu_collect")}
+          classes={classes}
+        />        
+        <ChildItem
           key="client"
           setContentComponent={setContentComponent}
           setheaderTitle={setheaderTitle}
@@ -165,6 +208,46 @@ function Navigator(props) {
           title={t("menu_client")}
           classes={classes}
         />
+
+        <Divider className={classes.divider} />
+        <ListItem className={classes.categoryHeader}>
+              <ListItemText classes={{ primary: classes.categoryHeaderPrimary, }} >
+                {t("menu_purchases")}
+              </ListItemText>
+        </ListItem>
+        <ChildItem
+          key="purchase"
+          setContentComponent={setContentComponent}
+          setheaderTitle={setheaderTitle}
+          icon={<Shop />}
+          component={<PurchaseTable />}
+          title={t("menu_purchase")}
+          classes={classes}
+        />        
+        <ChildItem
+          key="provider"
+          setContentComponent={setContentComponent}
+          setheaderTitle={setheaderTitle}
+          icon={<SupervisorAccountIcon />}
+          component={<ProviderTable />}
+          title={t("menu_provider")}
+          classes={classes}
+        />
+        <Divider className={classes.divider} />
+        <ListItem className={classes.categoryHeader}>
+              <ListItemText classes={{ primary: classes.categoryHeaderPrimary, }} >
+                {t("menu_inventory")}
+              </ListItemText>
+        </ListItem>
+        <ChildItem
+          key="inventory_move"
+          setContentComponent={setContentComponent}
+          setheaderTitle={setheaderTitle}
+          icon={<Shop />}
+          component={<PurchaseTable />}
+          title={t("menu_inventory_move")}
+          classes={classes}
+        />        
         <ChildItem
           key="product_category"
           setContentComponent={setContentComponent}
@@ -186,28 +269,28 @@ function Navigator(props) {
         <Divider className={classes.divider} />
         <ListItem className={classes.categoryHeader}>
               <ListItemText classes={{ primary: classes.categoryHeaderPrimary, }} >
-                {t("menu_purchases")}
+                {t("menu_cash")}
               </ListItemText>
         </ListItem>
         <ChildItem
-          key="purchase"
+          key="cash_move"
           setContentComponent={setContentComponent}
           setheaderTitle={setheaderTitle}
           icon={<Shop />}
-          component={""}
-          title={t("menu_purchase")}
+          component={<PurchaseTable />}
+          title={t("menu_cash_move")}
           classes={classes}
-        />
+        />        
         <ChildItem
-          key="provider"
+          key="payment_methods"
           setContentComponent={setContentComponent}
           setheaderTitle={setheaderTitle}
-          icon={<SupervisorAccountIcon />}
-          component={<ProviderTable />}
-          title={t("menu_provider")}
+          icon={<Category />}
+          component={<PaymentMethod />}
+          title={t("menu_payment_method")}
           classes={classes}
-        />
-        <Divider className={classes.divider} />
+        />        
+        <Divider className={classes.divider} />        
       </List>
     </Drawer>
   );

@@ -3,16 +3,13 @@ import MaterialTable from 'material-table';
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 import Modal from '@material-ui/core/Modal';
-import InvoiceForm from './InvoiceForm';
+import PurchaseForm from './PurchaseForm';
 import GenericDialogBox from '../../components/GenericDialogBox';
 import InfoBox from '../../components/InfoBox';
 import DataService from "../../services/data.service";
 import PatchedPagination from '../../components/PatchedPagination'
 import { useTranslation } from "react-i18next";
 import { parseISO, format } from 'date-fns';
-import InvoiceExample from '../../components/Invoice/InvoiceExample';
-import InvoiceReport from '../../components/Invoice/InvoiceReport';
-import InvoicePrint from '../../components/Invoice/InvoicePrint';
 
 const classes = (theme) => ({
   paper: {
@@ -43,7 +40,7 @@ const classes = (theme) => ({
 });
 
 
-const InvoiceModal = React.forwardRef((props, ref) => {
+const PurchaseModal = React.forwardRef((props, ref) => {
   const { handleFormCLose, showForm, idToUpdate } = props;
 
   return (
@@ -52,7 +49,7 @@ const InvoiceModal = React.forwardRef((props, ref) => {
       onClose={handleFormCLose}
       aria-labelledby="simple-modal-title"
       aria-describedby="simple-modal-description">
-      <InvoiceForm idToUpdate={idToUpdate} />      
+      <PurchaseForm idToUpdate={idToUpdate} />      
     </Modal>
   )
 })
@@ -60,10 +57,10 @@ const InvoiceModal = React.forwardRef((props, ref) => {
 
 const baseURL = process.env.REACT_APP_PUBLIC_API_URL
 const base_url = 'api'
-const endpoint = `${base_url}/invoice/`
-const endpointPaginated = `${baseURL}/api/invoice/`
+const endpoint = `${base_url}/purchase/`
+const endpointPaginated = `${baseURL}/api/purchase/`
 
-const InvoiceTable = (props) => {
+const PurchaseTable = (props) => {
   const { t } = useTranslation();
 
   const [data, setData] = useState([]);
@@ -113,7 +110,7 @@ const InvoiceTable = (props) => {
   const [printDialogOpen, setPrintDialogOpen] = useState(false);
   const [printDialogueTitle, setPrintDialogueTitle] = useState('');
   const [printDialogueBody, setPrintDialogueBody] = useState('');
-  const [invoiceObj, setInvoiceObj] = useState({});
+  const [purchaseObj, setPurchaseObj] = useState({});
   // ************
 
   // FORM VARS
@@ -189,22 +186,22 @@ const InvoiceTable = (props) => {
         title={infoTitle}
         body={infoBody} />
 
-      <InvoiceModal handleFormCLose={handleFormCLose} showForm={showForm} idToUpdate={idToUpdate} />      
+      <PurchaseModal handleFormCLose={handleFormCLose} showForm={showForm} idToUpdate={idToUpdate} />      
 
       <MaterialTable
-        title={t("invoice_table_title")}
+        title={t("purchase_table_title")}
         tableRef={tableRef}
         columns={[
           { title: 'ID', field: 'id' },
           { title: t("form_table_column_date"), field: 'date' , render: rowData => format(parseISO(rowData.date), 'dd/MM/yyyy') },
-          { title: t("form_table_column_invoice"), field: 'invoice' },
+          { title: t("form_table_column_purchase"), field: 'invoice' },
           { title: t("form_table_column_due_date"), field: 'due_date' , render: rowData => format(parseISO(rowData.due_date), 'dd/MM/yyyy') },
-          { title: t("form_table_column_client"), field: 'client.name' },
+          { title: t("form_table_column_client"), field: 'provider.name' },
           { title: t("form_table_column_subtotal"), field: 'subtotal', render: rowData => rowData.subtotal.toFixed(2) },
           { title: t("form_table_column_discount"), field: 'dct' , render: rowData => rowData.dct.toFixed(2)},
           { title: t("form_table_column_tax"), field: 'tax' , render: rowData => rowData.tax.toFixed(2)},
           { title: t("form_table_column_total"), field: 'total' , render: rowData => rowData.total.toFixed(2)},
-          { title: t("form_table_column_collected"), field: 'collected', render: rowData => rowData.collected.toFixed(2)}
+          { title: t("form_table_column_payed"), field: 'collected' , render: rowData => rowData.collected ? 'Yes' : 'No'}
         ]}
         
         data={data}
@@ -222,7 +219,8 @@ const InvoiceTable = (props) => {
           {
             icon: 'print',
             tooltip: t("detail_print_record_tip"),
-            onClick: (event, rowData) => InvoicePrint(rowData)            
+            onClick: (event, rowData) => {}
+            // onClick: (event, rowData) => PurchaseReport(rowData)
           }
           //add collect button
         ]}
@@ -243,4 +241,4 @@ const InvoiceTable = (props) => {
   )
 }
 
-export default InvoiceTable;
+export default PurchaseTable;
