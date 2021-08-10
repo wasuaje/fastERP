@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from ..dependencies import get_current_active_user, get_db, get_user_permissions
 from ..schemas.invoice import Invoice, InvoiceCreate, InvoiceDelete, InvoiceResponse
 from ..schemas.auth import User
-from ..crud.invoice import get_invoicees, create_invoice
+from ..crud.invoice import get_invoicees, create_invoice, get_pending_invoices
 from ..crud.invoice import get_invoice, delete_invoice, update_invoice
 # from fastapi_pagination import paginate, Page
 
@@ -22,6 +22,13 @@ def list_invoice(skip: int = 0, limit: int = 100,
     return invoice
     # return paginate(invoice)
 
+
+@router.get("/api/invoice/pending", response_model=List[InvoiceResponse], tags=["Invoice"])
+def list_pending_invoice(skip: int = 0, limit: int = 100,
+                 db: Session = Depends(get_db)):
+    invoice = get_pending_invoices(db, skip=skip, limit=limit)
+    return invoice
+    # return paginate(invoice)
 
 
 @router.post("/api/invoice/", response_model=Invoice, tags=["Invoice"])

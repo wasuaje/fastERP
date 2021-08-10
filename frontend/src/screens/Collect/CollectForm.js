@@ -41,7 +41,7 @@ const useStyles = makeStyles((theme) => ({
 
 const base_url = 'api'
 const endpoint = `${base_url}/collect`
-const invoiceEndpoint = `${base_url}/invoice/`
+const invoiceEndpoint = `${base_url}/invoice/pending`
 const profesionalEndpoint = `${base_url}/profesional`
 const DATE_FORMAT = 'yyyy-MM-dd';
 
@@ -66,7 +66,7 @@ const CollectForm = React.forwardRef((props, ref) => {
 		DataService.getAll(invoiceEndpoint)
 			.then(response => {
 				setInvoiceData(response.data)
-				console.log(response.data);
+				// console.log(response.data);
 			})
 			.catch(e => {
 				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)
@@ -243,7 +243,7 @@ const CollectForm = React.forwardRef((props, ref) => {
 							// value={value}
 							options={invoiceData}
 							getOptionLabel={(option) => option.invoice ? option.invoice : "-"}
-							onChange={(event, newValue) => {
+							onChange={(event, newValue) => {								
 								setInvoiceValue(newValue);
 							}}
 							inputValue={invoiceInputValue}
@@ -254,6 +254,7 @@ const CollectForm = React.forwardRef((props, ref) => {
 							value={invoiceValue ? invoiceValue : ""}
 							renderInput={(params) => <TextField {...params} label={t("collect_form_lbl_collect_invoice")} variant="outlined" />}
 							getOptionSelected={(option, value) => option.value === value.value}
+							style={{ marginTop: '15px' }}
 						/>
 						<MuiPickersUtilsProvider utils={DateFnsUtils}>
 							<KeyboardDatePicker
@@ -294,12 +295,14 @@ const CollectForm = React.forwardRef((props, ref) => {
 							onChange={event => setTotalValue(event.target.value)}
 							value={totalValue}
 							disabled={true}
+							style={{ marginTop: '1px' }}
 						/>
 					</Grid>
 					<Grid item xs={8}>
 						<DetailTable
 							collectId={collectId}
-							setCollectId={setCollectId}						
+							setCollectId={setCollectId}													
+							invoiceData={invoiceValue}
 						/>
 					</Grid>
 					<Grid item xs={12}>

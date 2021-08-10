@@ -15,6 +15,10 @@ def get_invoicees(db: Session, skip: int = 0, limit: int = 100):
     # print(str(query))
     return query
 
+def get_pending_invoices(db: Session, skip: int = 0, limit: int = 100):
+    query = db.query(InvoiceModel).outerjoin(Collect).filter(InvoiceModel.id == Collect.invoice_id, Collect.total < InvoiceModel.total).all()
+    # print(str(query))
+    return query
 
 def create_invoice(db: Session, invoice: InvoiceCreate):
     db_invoice = InvoiceModel(date=invoice.date,

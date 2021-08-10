@@ -24,7 +24,7 @@ class CollectDetailDelete(BaseModel):
 
 
 class CollectDetailBase(BaseModel):
-    amount: int
+    amount: float
     reference: str
     bank_id: Optional[int]
     payment_method_id: int
@@ -56,7 +56,7 @@ class CollectDetail(Collect, CollectDetailBase):
 
 
 class CollectDetailResponse(Collect):
-    amount: int
+    amount: float
     reference: str
     collect_id: int    
     payment_method: PaymentMethodResponse    

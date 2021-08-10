@@ -41,7 +41,7 @@ const DetailForm = (props) => {
 	const paymentMethodEndpoint = `${base_url}/payment-method`
 	const bankEndpoint = `${base_url}/bank`
 	const getData = props.getData;
-	const { collectId, setCollectId } = props	
+	const { collectId, setCollectId, invoiceData } = props	
 	const [total, setTotal] = useState(0.00)
 	const openNoticeBox = props.openNoticeBox
 	const { t } = useTranslation();
@@ -115,7 +115,7 @@ const DetailForm = (props) => {
 			'payment_method_id': paymentMethodValue.id,			
 			'reference': reference,
 			'amount': amount,
-			'bank_id': bankValue.id
+			'bank_id': typeof bankValue === 'undefined' ? null : bankValue.id
 		}
 		//  console.log(values)					
 		addData(values)
@@ -136,7 +136,7 @@ const DetailForm = (props) => {
 		<Grid container spacing={1}>
 			<Grid item xs={12}>
 				<Typography variant="h6" component="h6">
-					Detail:
+					{t("collect_form_detail_lbl_detail")}
 				</Typography>
 			</Grid>
 			<Grid item xs={2}>
@@ -228,28 +228,29 @@ const collectEndpoint = `${base_url}/collect`
 const DetailTable = (props) => {	
 	const { t } = useTranslation();
 
-	const { collectId, setCollectId, dctValue, taxValue } = props	
-
-	const [detailSubTotal, setDetailSubTotal] = useState("0.00")
-
-	const [detailDctTotal, setDetailDctTotal] = useState("0.00")
+	const { collectId, setCollectId, dctValue, taxValue, invoiceData } = props	
+	// console.log("invoice data:",invoiceData)
+	const [invoiceTotal, setInvoiceTotal] = useState("0.00")
 	useEffect(() => {
-		setDetailDctTotal(detailSubTotal*(dctValue/100))
-	}, [dctValue, detailSubTotal ]);
+		if (typeof invoiceData !== 'undefined') setInvoiceTotal(invoiceData.total)		
+	}, [invoiceData]);
 
-	const [detailTaxTotal, setDetailTaxTotal] = useState("0.00")
+	const [collectTotal, setCollectTotal] = useState("0.00")
 	useEffect(() => {
-		let tmpdct = detailSubTotal*(dctValue/100)
-		setDetailTaxTotal((detailSubTotal-tmpdct)*(taxValue/100))
-	}, [taxValue, detailSubTotal ]);
+		// setCollectTotal(invoiceTotal)		
+	}, [invoiceData ]);
 
-	const [detailTotal, setDetailTotal] = useState("0.00")							
+	// const [detailTaxTotal, setDetailTaxTotal] = useState("0.00")
+	// useEffect(() => {
+	// 	let tmpdct = invoiceTotal*(dctValue/100)
+	// 	setDetailTaxTotal((invoiceTotal-tmpdct)*(taxValue/100))
+	// }, [taxValue, invoiceTotal ]);
+
+	const [missingTotal, setMissingTotal] = useState("0.00")							
 	useEffect(() => {
-		// console.log(detailSubTotal,detailDctTotal,detailTaxTotal)
-		let tmpdct = detailSubTotal*(dctValue/100)
-		let tmptax = (detailSubTotal-tmpdct)*(taxValue/100)
-		setDetailTotal(detailSubTotal-tmpdct+tmptax)
-	}, [taxValue, dctValue, detailSubTotal ]);
+		// console.log(invoiceTotal,collectTotal,detailTaxTotal)		
+		if (typeof invoiceData !== 'undefined') setMissingTotal(invoiceTotal-collectTotal)
+	}, [collectTotal, invoiceData, invoiceTotal ]);
 
 	const [showForm, setShowForm] = useState(false);
 
@@ -308,11 +309,15 @@ const DetailTable = (props) => {
 				setDetailData(response.data)				
 				var sumdetail = 0;
 				response.data.forEach(function (record) {
-					sumdetail += record.total;
+					sumdetail += record.amount;
 				});
-				setDetailSubTotal(sumdetail)				
+				var totalfact = typeof invoiceData === 'undefined' ? "0.00" : invoiceData.total 
+				setCollectTotal(sumdetail)	
+				setInvoiceTotal(totalfact)			
+				setMissingTotal(totalfact-sumdetail)
 			})
 			.catch(e => {
+				// console.log(e)
 				if (e.response.status !== '404') {
 					openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)
 					// setData(emptyData)
@@ -387,16 +392,13 @@ const DetailTable = (props) => {
 			/>
 			<div style={{ align: 'right', width: '500px', textAlignLast: 'right' }}>
 				<Typography variant="h6" component="h6">
-					Subtotal: {parseFloat(detailSubTotal).toFixed(2)}
+				{t("collect_form_detail_lbl_total_invoice")}: {parseFloat(invoiceTotal).toFixed(2)}
 				</Typography>
 				<Typography variant="h6" component="h6">
-					Discount ({parseFloat(dctValue).toFixed(2)}): {parseFloat(detailDctTotal).toFixed(2)}
-				</Typography>
-				<Typography variant="h6" component="h6">
-					Tax ({parseFloat(taxValue).toFixed(2)}): {parseFloat(detailTaxTotal).toFixed(2)}
-				</Typography>
+				{t("collect_form_detail_lbl_total_collected")}: {parseFloat(collectTotal).toFixed(2)}
+				</Typography>				
 				<Typography variant="h5" component="h5">
-					Total: {parseFloat(detailTotal).toFixed(2)}
+				{t("collect_form_detail_lbl_missing_to_collect")}: {parseFloat(missingTotal).toFixed(2)}
 				</Typography>
 			</div>
 		</Grid>
