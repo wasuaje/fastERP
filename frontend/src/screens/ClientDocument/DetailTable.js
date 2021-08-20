@@ -39,23 +39,23 @@ const useStyles = makeStyles((theme) => ({
 const DetailForm = (props) => {
 	const base_url = 'api'	
 	const getData = props.getData;
-	const { purchaseId, setPurchaseId, productData, setProductData } = props
+	const { clientDocumentId, setClientDocumentId, productData, setProductData } = props
 	const [qtty, setQtty] = useState(1)
 	const [price, setPrice] = useState(0.00)
 	const openNoticeBox = props.openNoticeBox
-	const { t } = useTranslation();
+	const { t } = useTranslation();	
 
-	const [productValue, setProductValue] = React.useState(productData[0]);
+	const [productValue, setProductValue] = React.useState("");
 	const [productInputValue, setProductInputValue] = React.useState('');
 
 
-	const addData = (values) => {
+	const addData = (values) => {		
 		DataService.create(`${endpoint}/`, values)
 			.then(response => {
-				// openNoticeBox("Notice", "Purchase created successfully")   			
-				// setPurchaseId(response.data.id)
+				// openNoticeBox("Notice", "Invoice created successfully")   			
+				// setInvoiceId(response.data.id)
 				// setData(emptyData)
-				getData(purchaseId)
+				getData(clientDocumentId)
 			})
 			.catch(e => {
 				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)
@@ -69,19 +69,19 @@ const DetailForm = (props) => {
 			return false
 		}
 		let values = {
-			'purchase_id': purchaseId,
+			'client_document_id': clientDocumentId,
 			'product_id': productValue.id,
 			'qtty': qtty,
 			'price': price,
 		}
 		//  console.log(values)					
 		addData(values)
-		// if (purchaseId == 0) {
+		// if (clientDocumentId == 0) {
 		// 	addData(values)		
 		// 	// resetForm()		
 		// }
-		// if (purchaseId > 0 ) {			
-		// 	values.id = purchaseId
+		// if (clientDocumentId > 0 ) {			
+		// 	values.id = clientDocumentId
 		// 	// console.log(values)
 		// 	updateData(values)
 		// }
@@ -112,11 +112,11 @@ const DetailForm = (props) => {
 					onInputChange={(event, newInputValue) => {
 						setProductInputValue(newInputValue);
 						setPrice(newInputValue.price)
-					}}
+					}}					
 
 					value={productValue ? productValue : ""}
-					renderInput={(params) => <TextField {...params} label={t("purchase_form_detail_lbl_product")} />}
-					disabled={purchaseId === 0 ? true : false}
+					renderInput={(params) => <TextField {...params} label={t("invoice_form_detail_lbl_product")} />}
+					disabled={clientDocumentId === 0 ? true : false}
 					getOptionSelected={(option, value) => option.value === value.value}
 
 
@@ -127,12 +127,12 @@ const DetailForm = (props) => {
 					margin="normal"
 					fullWidth
 					id="qtty"
-					label={t("purchase_form_detail_lbl_qtty")}
+					label={t("invoice_form_detail_lbl_qtty")}
 					name="qtty"
 					onChange={event => setQtty(event.target.value)}
 					value={qtty}
 					style={{ marginTop: '-1px' }}
-					disabled={purchaseId === 0 ? true : false}
+					disabled={clientDocumentId === 0 ? true : false}
 				/>
 			</Grid>
 			<Grid item xs={2}>
@@ -140,12 +140,12 @@ const DetailForm = (props) => {
 					margin="normal"
 					fullWidth
 					id="price"
-					label={t("purchase_form_detail_lbl_price")}
+					label={t("invoice_form_detail_lbl_price")}
 					name="price"
 					onChange={event => setPrice(event.target.value)}
 					value={price ? price : 0}
 					style={{ marginTop: '-1px' }}
-					disabled={purchaseId === 0 ? true : false}
+					disabled={clientDocumentId === 0 ? true : false}
 				/>
 			</Grid>
 			<Grid item xs={2}>
@@ -153,7 +153,7 @@ const DetailForm = (props) => {
 					margin="normal"
 					fullWidth
 					id="total"
-					label={t("purchase_form_detail_lbl_total")}
+					label={t("invoice_form_detail_lbl_total")}
 					name="total"
 					disabled
 					// onChange={event => { }}
@@ -171,14 +171,13 @@ const DetailForm = (props) => {
 }
 
 const base_url = 'api'
-const endpoint = `${base_url}/purchase-detail`
-const purchaseEndpoint = `${base_url}/purchase`
+const endpoint = `${base_url}/client-document-detail`
 
 
 const DetailTable = (props) => {	
 	const { t } = useTranslation();
 
-	const { purchaseId, setPurchaseId, dctValue, taxValue, productData, setProductData } = props	
+	const { clientDocumentId, setInvoiceId, dctValue, taxValue, productData, setProductData } = props	
 
 	const [detailSubTotal, setDetailSubTotal] = useState("0.00")
 
@@ -248,7 +247,7 @@ const DetailTable = (props) => {
 
 	const [detailData, setDetailData] = useState([]);
 	useEffect(() => {
-		getData(purchaseId)
+		getData(clientDocumentId)
 	}, []);
 
 	const getData = (id) => {
@@ -278,8 +277,8 @@ const DetailTable = (props) => {
 		var dataDelete = { 'id': id };
 		DataService.delete(endpoint, dataDelete)
 			.then(response => {
-				// openNoticeBox("Notice", "Purchase deleted successfully")   
-				getData(purchaseId)
+				// openNoticeBox("Notice", "Invoice deleted successfully")   
+				getData(clientDocumentId)
 			})
 			.catch(e => {
 				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)
@@ -305,10 +304,10 @@ const DetailTable = (props) => {
 				title="Detail"
 				columns={[
 					{ title: 'ID', field: 'id' },
-					{ title: t("purchase_form_detail_product"), field: 'product.name' },
-					{ title: t("purchase_form_detail_qtty"), field: 'qtty' },
-					{ title: t("purchase_form_detail_price"), field: 'price' },
-					{ title: t("purchase_form_detail_total"), field: 'total' }
+					{ title: t("invoice_form_detail_product"), field: 'product.name' },
+					{ title: t("invoice_form_detail_qtty"), field: 'qtty' },
+					{ title: t("invoice_form_detail_price"), field: 'price' },
+					{ title: t("invoice_form_detail_total"), field: 'total' }
 				]}
 				data={detailData}
 				actions={[
@@ -327,7 +326,7 @@ const DetailTable = (props) => {
 					Toolbar: props => (
 						<div style={{ backgroundColor: '#e8eaf5' }}>
 							<DetailForm
-								purchaseId={purchaseId}
+								clientDocumentId={clientDocumentId}
 								openNoticeBox={openNoticeBox}
 								getData={getData}
 								productData={productData}
@@ -337,7 +336,7 @@ const DetailTable = (props) => {
 					)
 				}}
 			/>
-			<div style={{ align: 'right', width: '500px', textAlignLast: 'right' }}>
+			<div style={{ align: 'right', width: '750px', textAlignLast: 'right' }}>
 				<Typography variant="h6" component="h6">
 					Subtotal: {parseFloat(detailSubTotal).toFixed(2)}
 				</Typography>

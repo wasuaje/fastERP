@@ -262,17 +262,18 @@ function jsPDFInvoiceTemplate(props) {
     doc.setTextColor(colorGray);
     doc.setFontSize(pdfConfig.fieldTextSize - 2);
 
-    if (param.contact.address || param.invoice.invDate) {
-        doc.text(10, currentHeight, param.contact.address);
-        doc.text(docWidth - 10, currentHeight, param.invoice.invDate, "right");
-        currentHeight += pdfConfig.subLineHeight;
-    }
-
     if (param.contact.phone || param.invoice.invGenDate) {
         doc.text(10, currentHeight, param.contact.phone);
         doc.text(docWidth - 10, currentHeight, param.invoice.invGenDate, "right");
         currentHeight += pdfConfig.subLineHeight;
     }
+    
+    if (param.contact.address || param.invoice.invDate) {
+        doc.text(10, currentHeight, param.contact.address);
+        doc.text(docWidth - 10, currentHeight, param.invoice.invDate, "right");
+        currentHeight += pdfConfig.subLineHeight;
+    }
+    
 
     if (param.contact.email) {
         doc.text(10, currentHeight, param.contact.email);

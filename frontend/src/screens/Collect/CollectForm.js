@@ -43,6 +43,8 @@ const base_url = 'api'
 const endpoint = `${base_url}/collect`
 const invoiceEndpoint = `${base_url}/invoice/pending`
 const profesionalEndpoint = `${base_url}/profesional`
+const bankEndpoint = `${base_url}/bank`
+const paymentMethodEndpoint = `${base_url}/payment-method`	
 const DATE_FORMAT = 'yyyy-MM-dd';
 
 const CollectForm = React.forwardRef((props, ref) => {
@@ -54,6 +56,41 @@ const CollectForm = React.forwardRef((props, ref) => {
 		return () => { isActive = false };
 	}, [collectId, setCollectId]);
 	const [selectedDate, setSelectedDate] = useState(new Date());	
+
+
+	const [bankData, setBankData] = useState([]);
+	useEffect(() => {
+
+		retrieveBankData()
+	}, []);
+
+	const retrieveBankData = () => {
+		DataService.getAll(bankEndpoint)
+			.then(response => {
+				setBankData(response.data)
+				// console.log("bank",response.data);
+			})
+			.catch(e => {
+				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)
+			});
+	}
+
+	const [paymentMethodData, setPaymentMethodData] = useState([]);
+	useEffect(() => {
+
+		retrievePaymentMethodData()
+	}, []);
+
+	const retrievePaymentMethodData = () => {
+		DataService.getAll(paymentMethodEndpoint)
+			.then(response => {
+				setPaymentMethodData(response.data)
+				// console.log("paymentMethod",response.data);
+			})
+			.catch(e => {
+				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)
+			});
+	}
 
 	// Getting Invoice data only once at the beggining
 	const [invoiceData, setInvoiceData] = useState([]);
@@ -303,6 +340,10 @@ const CollectForm = React.forwardRef((props, ref) => {
 							collectId={collectId}
 							setCollectId={setCollectId}													
 							invoiceData={invoiceValue}
+							bankData={bankData}						
+							setBankData={setBankData}	
+							paymentMethodData={paymentMethodData}
+							setPaymentMethodData={setPaymentMethodData}
 						/>
 					</Grid>
 					<Grid item xs={12}>

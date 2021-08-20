@@ -8,14 +8,14 @@ import { parseISO, format } from 'date-fns';
 
 
 // define a generatePDF function that accepts a invoices argument
-const generateInvoicePrintPDF = (invoice, configData) => {
-    console.log(invoice)    
+const generateInvoicePrintPDF = (order, configData) => {
+    console.log(order)    
     console.log("Config: ",configData)
     
 
-    const totalDct = invoice.subtotal * (invoice.dct / 100)
-    const totalTax = (invoice.subtotal - totalDct) * (invoice.tax / 100)
-    const arrProducts = Array.from(invoice.invoice_detail, (item, index) => ([
+    const totalDct = order.subtotal * (order.dct / 100)
+    const totalTax = (order.subtotal - totalDct) * (order.tax / 100)
+    const arrProducts = Array.from(order.client_document_detail, (item, index) => ([
         index + 1,
         item.product.name,
         item.price,
@@ -27,7 +27,7 @@ const generateInvoicePrintPDF = (invoice, configData) => {
     var props = {
         outputType: 'blob',
         returnJsPDFDocObject: true,
-        fileName: `Invoice-${invoice.invoice}`,
+        fileName: `Order-${order.order}`,
         orientationLandscape: false,
         logo: {
             src: configData.company_logo_url,
@@ -47,27 +47,27 @@ const generateInvoicePrintPDF = (invoice, configData) => {
             website: configData.company_web_url,
         },
         contact: {
-            label: "factura a nombre de:",
-            name: invoice.client.name,
-            address: `${invoice.client.address}-${invoice.client.city}-${invoice.client.zip_code}`,
-            phone: invoice.client.phone,
-            email: invoice.client.email,
-            otherInfo: invoice.client.website,
+            label: "orden para:",
+            name: order.client.name,
+            address: `${order.client.address}-${order.client.city}-${order.client.zip_code}`,
+            phone: order.client.phone,
+            email: order.client.email,
+            otherInfo: order.client.website,
         },
         invoice: {
-            label: "Factura Nro: ",
-            num: invoice.invoice,
-            invDate: `F. Vencimiento: ${format(parseISO(invoice.due_date), 'dd/MM/yyyy')}` ,
-            invGenDate: `Fecha Factura: ${format(parseISO(invoice.date), 'dd/MM/yyyy')}` ,
+            label: "Orden Nro: ",
+            num: order.document,
+            invDate: `F. Vencimiento: ${format(parseISO(order.due_date), 'dd/MM/yyyy')}` ,
+            invGenDate: `Fecha Orden: ${format(parseISO(order.date), 'dd/MM/yyyy')}` ,
             headerBorder: true,
             tableBodyBorder: true,
             header: ["#", "Descripcion", "Precio", "Cant.", "Unidad", "Total"],
             table: arrProducts,
             invTotalLabel: "Total:",
-            invTotal: invoice.total.toFixed(2),
+            invTotal: order.total.toFixed(2),
             invCurrency: "$",
             row2: {
-                col1: `IVA: (${invoice.dct}%)`,
+                col1: `IVA: (${order.dct}%)`,
                 col2: totalTax.toFixed(2),
                 col3: '$',
                 style: {
@@ -75,7 +75,7 @@ const generateInvoicePrintPDF = (invoice, configData) => {
                 }
             },
             row3: {
-                col1: `DCTO: (${invoice.tax}%)`,
+                col1: `DCTO: (${order.tax}%)`,
                 col2: totalDct.toFixed(2),
                 col3: '$',
                 style: {
@@ -84,17 +84,17 @@ const generateInvoicePrintPDF = (invoice, configData) => {
             },
             row1: {
                 col1: 'SubTotal:',
-                col2: invoice.subtotal.toFixed(2),
+                col2: order.subtotal.toFixed(2),
                 col3: '$',
                 style: {
                     fontSize: 10 //optional, default 12
                 }
             },
             invDescLabel: "Nota:",
-            invDesc: invoice.body_note,
+            invDesc: order.body_note,
         },
         footer: {
-            text: invoice.foot_note,
+            text: order.foot_note,
         },
         pageEnable: true,
         pageLabel: "Page ",
@@ -103,7 +103,7 @@ const generateInvoicePrintPDF = (invoice, configData) => {
     var blob = pdfCreated.blob;
 
     console.log(pdfCreated)
-    console.log(invoice)
+    console.log(order)
     var pdfObject = pdfCreated.jsPDFDocObject;
 
 

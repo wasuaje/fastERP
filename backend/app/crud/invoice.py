@@ -1,9 +1,11 @@
+from app.crud.utils import get_next_document_number
 from app.schemas.collect import CollectCreate
 from sqlalchemy.orm import Session
 import sqlalchemy as sa
 from ..models import Collect, Invoice as InvoiceModel, InvoiceDetail as InvoiceDetailModel
 from ..schemas.invoice import InvoiceCreate, Invoice, InvoiceDelete
 from .invoice_detail import update_invoice as refresh_invoice
+from .utils import get_next_document_number
 
 # CASH
 def get_invoice(db: Session, invoice_id: int):
@@ -32,7 +34,7 @@ def create_invoice(db: Session, invoice: InvoiceCreate):
                               body_note=invoice.body_note,
                               foot_note=invoice.foot_note,
                               )
-
+    db_invoice.invoice = get_next_document_number(db, 'fv')
     db.add(db_invoice)
     db.commit()
     return db_invoice

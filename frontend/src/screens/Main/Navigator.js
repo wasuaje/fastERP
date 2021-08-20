@@ -37,7 +37,7 @@ import PurchaseTable from '../Purchase/PurchaseTable';
 import ProviderTable from '../Provider/ProviderTable';
 import PaymentMethod from '../PaymentMethod/PaymentMethodTable';
 import CollectTable from '../Collect/CollectTable';
-
+import ClientDocumentTable from '../ClientDocument/ClientDocumentTable'
 const styles = (theme) => ({
   categoryHeader: {
     paddingTop: theme.spacing(2),
@@ -197,6 +197,15 @@ function Navigator(props) {
           icon={<Receipt />}
           component={<CollectTable />}
           title={t("menu_collect")}
+          classes={classes}
+        />        
+        <ChildItem
+          key="client_documents"
+          setContentComponent={setContentComponent}
+          setheaderTitle={setheaderTitle}
+          icon={<Receipt />}
+          component={<ClientDocumentTable />}
+          title={t("menu_client_document")}
           classes={classes}
         />        
         <ChildItem

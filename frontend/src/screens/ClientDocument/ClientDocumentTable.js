@@ -5,14 +5,15 @@ import Fab from '@material-ui/core/Fab';
 import Grid from '@material-ui/core/Grid';
 import AddIcon from '@material-ui/icons/Add';
 import Modal from '@material-ui/core/Modal';
-import InvoiceForm from './InvoiceForm';
+import ClientDocumentForm from './ClientDocumentForm';
 import GenericDialogBox from '../../components/GenericDialogBox';
 import InfoBox from '../../components/InfoBox';
 import DataService from "../../services/data.service";
 import PatchedPagination from '../../components/PatchedPagination'
 import { useTranslation } from "react-i18next";
 import { parseISO, format } from 'date-fns';
-import InvoicePrint from '../../components/Invoice/InvoicePrint';
+import SettingsIcon from '@material-ui/icons/Settings';
+import OrderPrint from '../../components/Invoice/OrderPrint';
 
 const useStyles = makeStyles((theme)  => ({
   paper: {    
@@ -50,8 +51,10 @@ const InvoiceModal = React.forwardRef((props, ref) => {
       open={showForm}
       onClose={handleFormCLose}
       aria-labelledby="simple-modal-title"
-      aria-describedby="simple-modal-description">
-      <InvoiceForm idToUpdate={idToUpdate} />      
+      aria-describedby="simple-modal-description"
+      style={{ marginTop: '-100px', marginLeft: '70px' }}
+      >      
+      <ClientDocumentForm idToUpdate={idToUpdate} />      
     </Modal>
   )
 })
@@ -59,8 +62,8 @@ const InvoiceModal = React.forwardRef((props, ref) => {
 
 const baseURL = process.env.REACT_APP_PUBLIC_API_URL
 const base_url = 'api'
-const endpoint = `${base_url}/invoice/`
-const endpointPaginated = `${baseURL}/api/invoice/`
+const endpoint = `${base_url}/client-document/`
+const processEndpoint = `${base_url}/client-document/invoice/`
 const configEndpoint = `${base_url}/configuration`
 
 const InvoiceTable = (props) => {
@@ -79,7 +82,7 @@ const InvoiceTable = (props) => {
         setData(response.data)        
       })
       .catch(e => {        
-        openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)
+        openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}  - ${e.response.data.detail}`)
       });
   }
 
@@ -91,11 +94,12 @@ const InvoiceTable = (props) => {
         retrieveData()
       })
       .catch(e => {
-        openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)
+        openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText} - ${e.response.data.detail}`)
       });
   }
 
-	const [configData, setConfigData] = useState({});
+
+  const [configData, setConfigData] = useState({});
 	useEffect(() => {
 
 		retrieveConfigData()
@@ -114,9 +118,24 @@ const InvoiceTable = (props) => {
 			})
 			.catch(e => {
         console.log(e)
-				alert(`Error - Code: ${e.response.status} Message: ${e.response.statusText}`)
+				alert(`Error - Code: ${e.response.status} Message: ${e.response.statusText} - ${e.response.data.detail}`)
 			});
 	}
+
+
+  const InvoiceDocument = (id) => {
+    var dataProcess = { 'id': id };
+    DataService.create(processEndpoint, dataProcess)
+      .then(response => {        
+        openNoticeBox("Notice",t("record_processed_success"))   
+        retrieveData()
+      })
+      .catch(e => {
+        console.log(e.response)
+        openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText} - ${e.response.data.detail}`)
+      });
+  }
+
 
   // INFO NOTIFICATION VARS
   const [infoOpen, setInfoOpen] = useState(false);
@@ -128,7 +147,13 @@ const InvoiceTable = (props) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogueTitle, setDialogueTitle] = useState('');
   const [dialogueBody, setDialogueBody] = useState('');
-  const [idToDelete, setidToDelete] = useState(null);
+  const [idToDelete, setidToDelete] = useState(null);  
+  const [idToPrint, setidToPrint] = useState(null);
+  // ************
+
+  // Process DIALOG VARS
+  const [idToProcess, setidToProcess] = useState(null);
+  const [dialogAction, setDialogAction] = useState('nothing');
   // ************
 
   // PRINT DIALOG VARS
@@ -153,7 +178,7 @@ const InvoiceTable = (props) => {
   };
 
   const handleFormOpen = (id) => {
-    // console.log("id",typeof id)
+    console.log("id",typeof id)
     let newId = typeof id === 'object' ? 0 : id
     setidToUpdate(newId)
     setShowForm(true);
@@ -175,7 +200,9 @@ const InvoiceTable = (props) => {
 
   // DELETE DIALOG FUNCTIONS 
   const handleDialogOk = () => {
-    deleteData(idToDelete)
+    // console.log("DialogAct: ",dialogAction)
+    if (dialogAction == 'delete') deleteData(idToDelete)
+    if (dialogAction == 'invoice') InvoiceDocument(idToProcess)
     setDialogOpen(false)
   };
 
@@ -186,14 +213,25 @@ const InvoiceTable = (props) => {
 
   };
 
-  const openDialogBox = (id) => {
-    setDialogueTitle(t("delete_record_question"))
-    setDialogueBody(t("sure_to_delete_record_question")+id)
-    // console.log(dialogOpen, dialogueTitle, dialogueBody)
-    setidToDelete(id)
+  const openDialogBox = (id, action) => {
+    setDialogAction(action)
+    if (action === 'delete'){      
+      setDialogueTitle(t("delete_record_question"))
+      setDialogueBody(t("sure_to_delete_record_question")+ ' ' +id)
+      // console.log(dialogOpen, dialogueTitle, dialogueBody)
+      setidToDelete(id)
+    }
+  
+    if (action === 'invoice'){
+      setDialogueTitle(t("invoice_record_question"))
+      setDialogueBody(t("sure_to_invoice_record_question")+ ' '+id)
+      // console.log(dialogOpen, dialogueTitle, dialogueBody)
+      setidToProcess(id)
+    }
     setDialogOpen(true)
   };
 
+  
 	const classes = useStyles();
 
   const tableRef = React.createRef();
@@ -216,19 +254,18 @@ const InvoiceTable = (props) => {
       <InvoiceModal handleFormCLose={handleFormCLose} showForm={showForm} idToUpdate={idToUpdate} />      
 
       <MaterialTable
-        title={t("invoice_table_title")}
+        title={t("client_document_table_title")}
         tableRef={tableRef}
         columns={[
           { title: 'ID', field: 'id' },
           { title: t("form_table_column_date"), field: 'date' , render: rowData => format(parseISO(rowData.date), 'dd/MM/yyyy') },
-          { title: t("form_table_column_invoice"), field: 'invoice' },
-          { title: t("form_table_column_due_date"), field: 'due_date' , render: rowData => format(parseISO(rowData.due_date), 'dd/MM/yyyy') },
+          { title: t("form_table_column_document_type"), field: 'document_type.code' },          
+          { title: t("form_table_column_document"), field: 'document' },          
           { title: t("form_table_column_client"), field: 'client.name' },
           { title: t("form_table_column_subtotal"), field: 'subtotal', render: rowData => rowData.subtotal.toFixed(2) },
           { title: t("form_table_column_discount"), field: 'dct' , render: rowData => rowData.dct.toFixed(2)},
           { title: t("form_table_column_tax"), field: 'tax' , render: rowData => rowData.tax.toFixed(2)},
-          { title: t("form_table_column_total"), field: 'total' , render: rowData => rowData.total.toFixed(2)},
-          { title: t("form_table_column_collected"), field: 'collected', render: rowData => rowData.collected.toFixed(2)}
+          { title: t("form_table_column_total"), field: 'total' , render: rowData => rowData.total.toFixed(2)},          
         ]}
         
         data={data}
@@ -241,12 +278,17 @@ const InvoiceTable = (props) => {
           {
             icon: 'delete',
             tooltip: t("detail_delete_record_tip"),
-            onClick: (event, rowData) => openDialogBox(rowData.id)
+            onClick: (event, rowData) => openDialogBox(rowData.id,'delete')
           },
           {
             icon: 'print',
             tooltip: t("detail_print_record_tip"),
-            onClick: (event, rowData) => InvoicePrint(rowData, configData)     
+            onClick: (event, rowData) => OrderPrint(rowData, configData)            
+          },
+          {
+            icon:  () => <SettingsIcon />,
+            tooltip: t("detail_invoice_record_tip"),
+            onClick: (event, rowData) => openDialogBox(rowData.id,'invoice')
           }
           //add collect button
         ]}

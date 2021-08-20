@@ -37,58 +37,21 @@ const useStyles = makeStyles((theme) => ({
 
 
 const DetailForm = (props) => {
-	const base_url = 'api'
-	const paymentMethodEndpoint = `${base_url}/payment-method`
-	const bankEndpoint = `${base_url}/bank`
+	const base_url = 'api'	
 	const getData = props.getData;
-	const { collectId, setCollectId, invoiceData } = props	
+	const { collectId, setCollectId, invoiceData, bankData, setBankData, paymentMethodData, setPaymentMethodData } = props	
 	const [total, setTotal] = useState(0.00)
 	const openNoticeBox = props.openNoticeBox
-	const { t } = useTranslation();
-
-	const [bankData, setBankData] = useState([]);
-	useEffect(() => {
-
-		retrieveBankData()
-	}, []);
-
-	const retrieveBankData = () => {
-		DataService.getAll(bankEndpoint)
-			.then(response => {
-				setBankData(response.data)
-				// console.log("bank",response.data);
-			})
-			.catch(e => {
-				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)
-			});
-	}
-
-	const [paymentMethodData, setPaymentMethodData] = useState([]);
-	useEffect(() => {
-
-		retrievePaymentMethodData()
-	}, []);
-
-	const retrievePaymentMethodData = () => {
-		DataService.getAll(paymentMethodEndpoint)
-			.then(response => {
-				setPaymentMethodData(response.data)
-				// console.log("paymentMethod",response.data);
-			})
-			.catch(e => {
-				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)
-			});
-	}
-
+	const { t } = useTranslation();	
 
 	const [amount, setAmount] = React.useState(0);
 	const [reference, setReference] = React.useState("");	
 	
-	const [bankValue, setBankValue] = React.useState(bankData[0]);
+	const [bankValue, setBankValue] = React.useState("-");
 	const [bankInputValue, setBankInputValue] = React.useState('');
 
 
-	const [paymentMethodValue, setPaymentMethodValue] = React.useState(paymentMethodData[0]);
+	const [paymentMethodValue, setPaymentMethodValue] = React.useState("-");
 	const [paymentMethodInputValue, setPaymentMethodInputValue] = React.useState('');
 
 	const addData = (values) => {
@@ -228,7 +191,7 @@ const collectEndpoint = `${base_url}/collect`
 const DetailTable = (props) => {	
 	const { t } = useTranslation();
 
-	const { collectId, setCollectId, dctValue, taxValue, invoiceData } = props	
+	const { collectId, setCollectId, dctValue, taxValue, invoiceData, bankData, setBankData, paymentMethodData, setPaymentMethodData } = props	
 	// console.log("invoice data:",invoiceData)
 	const [invoiceTotal, setInvoiceTotal] = useState("0.00")
 	useEffect(() => {
@@ -385,6 +348,10 @@ const DetailTable = (props) => {
 								collectId={collectId}
 								openNoticeBox={openNoticeBox}
 								getData={getData}
+								bankData={bankData}						
+								setBankData={setBankData}
+								paymentMethodData={paymentMethodData}
+								setPaymentMethodData={setPaymentMethodData}							
 							/>
 						</div>
 					)

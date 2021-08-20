@@ -43,6 +43,7 @@ const base_url = 'api'
 const endpoint = `${base_url}/purchase`
 const providerEndpoint = `${base_url}/provider`
 const profesionalEndpoint = `${base_url}/profesional`
+const productEndpoint = `${base_url}/product`
 const DATE_FORMAT = 'yyyy-MM-dd';
 
 const PurchaseForm = React.forwardRef((props, ref) => {
@@ -74,6 +75,22 @@ const PurchaseForm = React.forwardRef((props, ref) => {
 			});
 	}
 
+	const [productData, setProductData] = useState([]);
+	useEffect(() => {
+
+		retrieveProductData()
+	}, []);
+
+	const retrieveProductData = () => {
+		DataService.getAll(productEndpoint)
+			.then(response => {
+				setProductData(response.data)
+				// console.log("product",response.data);
+			})
+			.catch(e => {
+				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)
+			});
+	}
 
 	const [bodyNoteValue,setBodyNoteValue] = useState("")
 	const [footNoteValue, setFootNoteValue] = useState("")
@@ -390,6 +407,8 @@ const PurchaseForm = React.forwardRef((props, ref) => {
 							setPurchaseId={setPurchaseId}
 							dctValue={dctValue}
 							taxValue={taxValue}
+							productData={productData}
+							setProductData={setProductData}
 						/>
 					</Grid>
 					<Grid item xs={12}>

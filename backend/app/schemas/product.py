@@ -39,6 +39,7 @@ class ProductQuickUpdate(ProductBase):
     name: str
     price: float
     stock: int
+    format: str
     created_on: Optional[datetime.datetime] = datetime.datetime.now()
 
     class Config:

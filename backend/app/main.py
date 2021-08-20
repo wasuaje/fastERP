@@ -1,3 +1,5 @@
+from .routers import client_document_detail
+from .routers import client_document
 from typing import List, Optional
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
@@ -12,7 +14,8 @@ from .routers import client, auth, cash, product, event
 from .routers import profesional, cash_detail, invoice, invoice_detail
 from .routers import product_category, provider, purchase, purchase_detail
 from .routers import permission, payment_method, configuration, collect
-from .routers import collect_detail, bank
+from .routers import collect_detail, bank, document_type, client_document
+from .routers import client_document_detail
 from .dependencies import get_current_active_user, get_user_permissions
 # from fastapi_pagination import  add_pagination
 
@@ -49,6 +52,9 @@ app.include_router(cash.router)
 app.include_router(cash_detail.router)
 app.include_router(invoice.router)
 app.include_router(invoice_detail.router)
+app.include_router(client_document.router)
+app.include_router(client_document_detail.router)
+app.include_router(document_type.router)
 app.include_router(purchase.router)
 app.include_router(purchase_detail.router)
 app.include_router(payment_method.router)

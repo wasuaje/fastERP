@@ -7,16 +7,19 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
+import Checkbox from '@material-ui/core/Checkbox';
 import { makeStyles } from '@material-ui/core/styles';
 import DateFnsUtils from '@date-io/date-fns';
 import { parseISO, format } from 'date-fns';
 import { KeyboardDatePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 import GenericDialogBox from '../../components/GenericDialogBox';
 import InfoBox from '../../components/InfoBox';
 import DataService from "../../services/data.service";
 import DetailTable from './DetailTable';
 import { useTranslation } from "react-i18next";
 import { alpha } from '@material-ui/core/styles';
+import { string } from 'yup';
 
 const useStyles = makeStyles((theme) => ({
 	paper: {
@@ -40,20 +43,27 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const base_url = 'api'
-const endpoint = `${base_url}/invoice`
+const endpoint = `${base_url}/client-document`
 const clientEndpoint = `${base_url}/client`
 const profesionalEndpoint = `${base_url}/profesional`
 const productEndpoint = `${base_url}/product`
+const documentTypeEndpoint = `${base_url}/document-type`
 const DATE_FORMAT = 'yyyy-MM-dd';
 
 const InvoiceForm = React.forwardRef((props, ref) => {
 	const { t } = useTranslation();
 	const { idToUpdate } = props;
-	const [invoiceId, setInvoiceId] = useState(props.idToUpdate)
+
+	const [affectInventory, setAffectInventory] = useState(false);
+	const handleChecked = (event) => {
+		setAffectInventory(event.target.checked);
+	};
+
+	const [clientDocumentId, setClientDocumentId] = useState(props.idToUpdate)
 	useEffect(() => {
 		let isActive = true;
 		return () => { isActive = false };
-	}, [invoiceId, setInvoiceId]);
+	}, [clientDocumentId, setClientDocumentId]);
 	const [selectedDate, setSelectedDate] = useState(new Date());
 	const [selectedDueDate, setSelectedDueDate] = useState(new Date());
 
@@ -92,7 +102,24 @@ const InvoiceForm = React.forwardRef((props, ref) => {
 			});
 	}
 
-	const [bodyNoteValue,setBodyNoteValue] = useState("")
+	const [documentTypeData, setDocumentTypeData] = useState([]);
+	useEffect(() => {
+
+		retrieveDocumentTypeData()
+	}, []);
+
+	const retrieveDocumentTypeData = () => {
+		DataService.getAll(documentTypeEndpoint)
+			.then(response => {
+				setDocumentTypeData(response.data)
+				// console.log("product",response.data);
+			})
+			.catch(e => {
+				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)
+			});
+	}
+
+	const [bodyNoteValue, setBodyNoteValue] = useState("")
 	const [footNoteValue, setFootNoteValue] = useState("")
 	const [dctValue, setDctValue] = useState("")
 	const [taxValue, setTaxValue] = useState("")
@@ -120,7 +147,9 @@ const InvoiceForm = React.forwardRef((props, ref) => {
 	const [clientInputValue, setClientInputValue] = React.useState('');
 	const [profesionalValue, setProfesionalValue] = React.useState(profesionalData[0]);
 	const [profesionalInputValue, setProfesionalInputValue] = React.useState('');
-	const [invoiceValue, setInvoiceValue] = React.useState("");
+	const [documentTypeValue, setDocumentTypeValue] = React.useState(documentTypeData[0]);
+	const [documentTypeInputValue, setDocumentTypeInputValue] = React.useState('');
+	const [clientDocumentValue, setClientDocumentValue] = React.useState("");
 
 	// INFO NOTIFICATION VARS
 	const [infoOpen, setInfoOpen] = useState(false);
@@ -162,7 +191,7 @@ const InvoiceForm = React.forwardRef((props, ref) => {
 	};
 	// *****************
 
-	
+
 	const [data, setData] = useState([]);
 	useEffect(() => {
 		let id = typeof idToUpdate === 'object' ? 0 : idToUpdate
@@ -171,25 +200,27 @@ const InvoiceForm = React.forwardRef((props, ref) => {
 
 	const getData = (id) => {
 		DataService.get(id, endpoint)
-			.then(response => {
-				// console.log("get data",response.data)		
-				setInvoiceId(response.data.id)
-				setInvoiceValue(response.data.invoice)		
+			.then(response => {				
+				setClientDocumentId(response.data.id)
+				setClientDocumentValue(response.data.document)
 				setSelectedDate(parseISO(response.data.date))
 				setSelectedDueDate(parseISO(response.data.due_date))
 				setClientInputValue(response.data.client.name)
 				setClientValue(response.data.client)
 				setProfesionalInputValue(response.data.employee.name)
 				setProfesionalValue(response.data.employee)
+				setDocumentTypeInputValue(response.data.document_type.code)
+				setDocumentTypeValue(response.data.document_type)
+				setAffectInventory(response.data.affect_inventory == 1 ? true : false)
 				setBodyNoteValue(response.data.body_note)
 				setFootNoteValue(response.data.foot_note)
 				setDctValue(response.data.dct)
 				setTaxValue(response.data.tax)
 			})
 			.catch(e => {
-				console.log(e)
+				// console.log(e)
 				if (e.response.status !== 404) {
-					openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)					
+					openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)
 				} else {
 					// setData({})
 					console.log("Unexpected error: ", e)
@@ -201,7 +232,7 @@ const InvoiceForm = React.forwardRef((props, ref) => {
 	const updateData = (values) => {
 		DataService.update(endpoint, values)
 			.then(response => {
-				openNoticeBox("Notice", t("record_updated_successfully", {"table": t("invoice_table_title")}))
+				openNoticeBox("Notice", t("record_updated_successfully", { "table": t("client_document_table_title") }))
 			})
 			.catch(e => {
 				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)
@@ -211,10 +242,9 @@ const InvoiceForm = React.forwardRef((props, ref) => {
 	const addData = (values) => {
 		DataService.create(`${endpoint}/`, values)
 			.then(response => {
-				openNoticeBox("Notice", t("record_created_successfully", {"table": t("invoice_table_title")}))
-				setInvoiceId(response.data.id)				
-				setInvoiceValue(response.data.invoice)
-
+				openNoticeBox("Notice", t("record_created_successfully", { "table": t("client_document_table_title") }))
+				setClientDocumentId(response.data.id)
+				setClientDocumentValue(response.data.document)
 			})
 			.catch(e => {
 				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)
@@ -223,29 +253,32 @@ const InvoiceForm = React.forwardRef((props, ref) => {
 
 	const submitForm = (event) => {
 		event.preventDefault();
-		var newDate,newDueDate = ""
+		var newDate, newDueDate = ""
 		newDate = format(selectedDate, DATE_FORMAT)
-		newDueDate = format(selectedDueDate, DATE_FORMAT)
-		if (typeof profesionalValue === 'undefined' || typeof clientValue === 'undefined' ){
-			openNoticeBox("Notice", t("fill_all_fields_msg", { "table": t("invoice_table_title") }))
+		newDueDate = format(selectedDueDate, DATE_FORMAT)		
+		if (typeof documentTypeValue === 'undefined' || typeof profesionalValue === 'undefined' || typeof clientValue === 'undefined' ){
+			openNoticeBox("Notice", t("fill_all_fields_msg", { "table": t("client_document_table_title") }))
 			return false
 		}
 		let values = {
+			'document_type_id': documentTypeValue.id,
 			'client_id': clientValue.id,
 			'date': newDate,
 			'due_date': newDueDate,
 			'employee_id': profesionalValue.id,
-			'invoice': invoiceValue,
+			'document': clientDocumentValue,
 			'dct': dctValue === '' ? 0.00 : dctValue,
-			'tax': taxValue === '' ? 0.00 : taxValue,			
+			'tax': taxValue === '' ? 0.00 : taxValue,
 			'body_note': bodyNoteValue,
-			'foot_note': footNoteValue
+			'foot_note': footNoteValue,
+			'affect_inventory': affectInventory ? 1 :0
 		}
-		if (invoiceId === 0) {
+		console.log(values)
+		if (clientDocumentId === 0) {			
 			addData(values)			
 		}
-		if (invoiceId > 0) {
-			values.id = invoiceId
+		if (clientDocumentId > 0) {
+			values.id = clientDocumentId
 			// console.log(values)
 			updateData(values)
 		}
@@ -275,22 +308,46 @@ const InvoiceForm = React.forwardRef((props, ref) => {
 				body={infoBody} />
 
 			<form className={classes.form} onSubmit={submitForm} onReset={handleReset}>
-				<Grid container spacing={2}>
-					<Grid item xs={4}>
+				<Grid container spacing={0}>
+					<Grid item xs={12}>
 						<Typography variant="h4" component="h4">
-							{t("invoice_form_invoice_id")}: {invoiceId ? invoiceId : 0}
+							{t("client_document_form_client_document_id")}: {clientDocumentId ? clientDocumentId : 0}
 						</Typography>
+					</Grid>
+					<Grid item xs={6}>
+						<Autocomplete
+							id="document_type"
+							// value={value}
+							options={documentTypeData}
+							getOptionLabel={(option) => option.name ? option.name : "-"}
+							onChange={(event, newValue) => {
+								setDocumentTypeValue(newValue);
+							}}
+							inputValue={documentTypeInputValue}
+							onInputChange={(event, newInputValue) => {
+								setDocumentTypeInputValue(newInputValue);
+							}}
+
+							value={documentTypeValue ? documentTypeValue : ""}
+							renderInput={(params) => <TextField {...params} label={t("client_document_form_lbl_client_document_type")} variant="outlined" />}
+							getOptionSelected={(option, value) => option.value === value.value}
+						/>
+					</Grid>
+					<Grid item xs={6}>
 						<TextField
 							variant="outlined"
 							margin="normal"
 							fullWidth
-							id="invoice"
-							label={t("invoice_form_lbl_invoice_invoice")}
-							name="invoice"
-							onChange={event => setInvoiceValue(event.target.value)}
-							value={invoiceValue}
+							id="document"
+							label={t("client_document_form_lbl_client_document_document")}
+							name="document"
+							onChange={event => setClientDocumentValue(event.target.value)}
+							value={clientDocumentValue}
+							style={{ marginTop: '0px' }}
 							disabled={true}
 						/>
+					</Grid>
+					<Grid item xs={6}>
 						<Autocomplete
 							id="client"
 							// value={value}
@@ -305,39 +362,11 @@ const InvoiceForm = React.forwardRef((props, ref) => {
 							}}
 
 							value={clientValue ? clientValue : ""}
-							renderInput={(params) => <TextField {...params} label={t("invoice_form_lbl_invoice_client")} variant="outlined" />}
+							renderInput={(params) => <TextField {...params} label={t("client_document_form_lbl_client_document_client")} variant="outlined" />}
 							getOptionSelected={(option, value) => option.value === value.value}
 						/>
-						<MuiPickersUtilsProvider utils={DateFnsUtils}>
-							<KeyboardDatePicker
-								clearable="true"
-								value={selectedDate}
-								placeholder="2021-07-07"
-								onChange={date => setSelectedDate(date)}
-								// minDate={new Date()}
-								format={DATE_FORMAT}
-								autoOk
-								name="date"
-								id="date"
-								variant="inline"
-								inputVariant="outlined"
-								style={{ marginTop: '5px' }}
-							/>
-							<KeyboardDatePicker
-								clearable="true"
-								value={selectedDueDate}
-								placeholder="2021-07-07"
-								onChange={dueDate => setSelectedDueDate(dueDate)}
-								// minDate={new Date()}
-								format={DATE_FORMAT}
-								autoOk
-								name="due_date"
-								id="due_date"
-								variant="inline"
-								inputVariant="outlined"
-								style={{ marginTop: '5px' }}
-							/>
-						</MuiPickersUtilsProvider>
+					</Grid>
+					<Grid item xs={6}>
 						<Autocomplete
 							id="profesional"
 							label={t("invoice_form_lbl_invoice_employee")}
@@ -354,11 +383,58 @@ const InvoiceForm = React.forwardRef((props, ref) => {
 							options={profesionalData}
 							value={profesionalValue ? profesionalValue : ""}
 							renderInput={(params) => <TextField {...params} label={t("invoice_form_lbl_invoice_employee")} variant="outlined" />}
-							style={{ marginTop: '7px' }}
 							getOptionSelected={(option, value) => option.value === value.value}
-
-
-						/>					
+						/>
+					</Grid>
+					<Grid item xs={4}>
+						<MuiPickersUtilsProvider utils={DateFnsUtils}>
+							<KeyboardDatePicker
+								clearable="true"
+								value={selectedDate}
+								placeholder="2021-07-07"
+								onChange={date => setSelectedDate(date)}
+								// minDate={new Date()}
+								format={DATE_FORMAT}
+								autoOk
+								name="date"
+								id="date"
+								variant="inline"
+								inputVariant="outlined"
+								style={{ marginTop: '5px' }}
+							/>
+						</MuiPickersUtilsProvider>
+					</Grid>
+					<Grid item xs={4}>
+						<MuiPickersUtilsProvider utils={DateFnsUtils}>
+							<KeyboardDatePicker
+								clearable="true"
+								value={selectedDueDate}
+								placeholder="2021-07-07"
+								onChange={dueDate => setSelectedDueDate(dueDate)}
+								// minDate={new Date()}
+								format={DATE_FORMAT}
+								autoOk
+								name="due_date"
+								id="due_date"
+								variant="inline"
+								inputVariant="outlined"
+								style={{ marginTop: '5px' }}
+							/>
+						</MuiPickersUtilsProvider>
+					</Grid>
+					<Grid item xs={4}>
+						<FormControlLabel
+							value={affectInventory}
+							checked={affectInventory}
+							control={<Checkbox color="primary" /> }
+							label={t("invoice_form_lbl_invoice_affect_inventory")}
+							labelPlacement="end"
+							onChange={handleChecked}
+							name="affect_inventory"
+							disabled={clientDocumentId === 0 ? false: true}
+						/>
+					</Grid>
+					<Grid item xs={6}>
 						<TextField
 							variant="outlined"
 							margin="normal"
@@ -367,11 +443,13 @@ const InvoiceForm = React.forwardRef((props, ref) => {
 							label={t("invoice_form_lbl_invoice_body_note")}
 							name="body_note"
 							multiline
-          					maxRows={4}
+							maxRows={4}
 							onChange={event => setBodyNoteValue(event.target.value)}
 							value={bodyNoteValue}
 							style={{ marginTop: '5px' }}
 						/>
+					</Grid>
+					<Grid item xs={6}>
 						<TextField
 							variant="outlined"
 							margin="normal"
@@ -380,11 +458,13 @@ const InvoiceForm = React.forwardRef((props, ref) => {
 							label={t("invoice_form_lbl_invoice_foot_note")}
 							name="foot_note"
 							multiline
-          					maxRows={4}
+							maxRows={4}
 							onChange={event => setFootNoteValue(event.target.value)}
 							value={footNoteValue}
-							style={{ marginTop: '-2px' }}
+							style={{ marginTop: '5px' }}
 						/>
+					</Grid>
+					<Grid item xs={6}>
 						<TextField
 							variant="outlined"
 							margin="normal"
@@ -396,6 +476,8 @@ const InvoiceForm = React.forwardRef((props, ref) => {
 							value={dctValue}
 							style={{ marginTop: '-2px' }}
 						/>
+					</Grid>
+					<Grid item xs={6}>
 						<TextField
 							variant="outlined"
 							margin="normal"
@@ -408,14 +490,15 @@ const InvoiceForm = React.forwardRef((props, ref) => {
 							style={{ marginTop: '-2px' }}
 						/>
 					</Grid>
-					<Grid item xs={8}>
+					<Grid item xs={12} style={{ marginTop: '10px', marginLeft: '20px' }}>
 						<DetailTable
-							invoiceId={invoiceId}
-							setInvoiceId={setInvoiceId}
+							clientDocumentId={clientDocumentId}
+							setClientDocumentId={setClientDocumentId}
 							dctValue={dctValue}
 							taxValue={taxValue}
 							productData={productData}
 							setProductData={setProductData}
+
 						/>
 					</Grid>
 					<Grid item xs={12}>
@@ -426,7 +509,7 @@ const InvoiceForm = React.forwardRef((props, ref) => {
 							color="primary"
 							className={classes.submit}
 						>
-							{invoiceId === 0 ? t("save_form_button") : t("update_form_button")}
+							{clientDocumentId === 0 ? t("save_form_button") : t("update_form_button")}
 
 						</Button>
 					</Grid>

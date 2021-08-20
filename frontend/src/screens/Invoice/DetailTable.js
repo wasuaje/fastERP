@@ -37,31 +37,13 @@ const useStyles = makeStyles((theme) => ({
 
 
 const DetailForm = (props) => {
-	const base_url = 'api'
-	const productEndpoint = `${base_url}/product`
+	const base_url = 'api'	
 	const getData = props.getData;
-	const { invoiceId, setInvoiceId } = props
+	const { invoiceId, setInvoiceId, productData, setProductData } = props
 	const [qtty, setQtty] = useState(1)
 	const [price, setPrice] = useState(0.00)
 	const openNoticeBox = props.openNoticeBox
-	const { t } = useTranslation();
-
-	const [productData, setProductData] = useState([]);
-	useEffect(() => {
-
-		retrieveProductData()
-	}, []);
-
-	const retrieveProductData = () => {
-		DataService.getAll(productEndpoint)
-			.then(response => {
-				setProductData(response.data)
-				// console.log("product",response.data);
-			})
-			.catch(e => {
-				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)
-			});
-	}
+	const { t } = useTranslation();	
 
 	const [productValue, setProductValue] = React.useState(productData[0]);
 	const [productInputValue, setProductInputValue] = React.useState('');
@@ -196,7 +178,7 @@ const invoiceEndpoint = `${base_url}/invoice`
 const DetailTable = (props) => {	
 	const { t } = useTranslation();
 
-	const { invoiceId, setInvoiceId, dctValue, taxValue } = props	
+	const { invoiceId, setInvoiceId, dctValue, taxValue, productData, setProductData } = props	
 
 	const [detailSubTotal, setDetailSubTotal] = useState("0.00")
 
@@ -348,6 +330,8 @@ const DetailTable = (props) => {
 								invoiceId={invoiceId}
 								openNoticeBox={openNoticeBox}
 								getData={getData}
+								productData={productData}
+								setProductData={setProductData}
 							/>
 						</div>
 					)
