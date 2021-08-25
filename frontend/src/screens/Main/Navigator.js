@@ -38,6 +38,11 @@ import ProviderTable from '../Provider/ProviderTable';
 import PaymentMethod from '../PaymentMethod/PaymentMethodTable';
 import CollectTable from '../Collect/CollectTable';
 import ClientDocumentTable from '../ClientDocument/ClientDocumentTable'
+import CashTable from '../Cash/CashTable';
+import logo from '../../assets/img/logo.jpg'; // Tell webpack this JS file uses this image
+
+
+
 const styles = (theme) => ({
   categoryHeader: {
     paddingTop: theme.spacing(2),
@@ -137,14 +142,14 @@ function Navigator(props) {
 
   // newCategories[0].children[3].active=true
 
-  // console.log("NC",newCategories)
+  // console.log("NC",newCategories)  
 
 
   return (
     <Drawer variant="permanent" {...other}>
       <List disablePadding>
         <ListItem className={clsx(classes.firebase, classes.item, classes.itemCategory)}>          
-          <Avatar alt="" src={configData.company_logo_url} className={styles.large} />
+          <Avatar alt="" src={logo} className={styles.large} />
           {configData.company_name}
         </ListItem>
         
@@ -286,7 +291,7 @@ function Navigator(props) {
           setContentComponent={setContentComponent}
           setheaderTitle={setheaderTitle}
           icon={<Shop />}
-          component={<PurchaseTable />}
+          component={<CashTable />}
           title={t("menu_cash_move")}
           classes={classes}
         />        

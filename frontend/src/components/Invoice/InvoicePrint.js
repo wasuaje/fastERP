@@ -1,16 +1,15 @@
 
-import jsPDFInvoiceTemplate, { OutputType } from "./InvoicecTemplate";
+import jsPDFInvoiceTemplate, { OutputType } from "./InvoiceTemplate";
 
 // Date Fns is used to format the dates we receive
 // from our API call
 import { parseISO, format } from 'date-fns';
+import logo from '../../assets/img/logo.jpg'; // Tell webpack this JS file uses this image
 
 
 
 // define a generatePDF function that accepts a invoices argument
-const generateInvoicePrintPDF = (invoice, configData) => {
-    console.log(invoice)    
-    console.log("Config: ",configData)
+const generateInvoicePrintPDF = (invoice, configData) => {    
     
 
     const totalDct = invoice.subtotal * (invoice.dct / 100)
@@ -30,8 +29,8 @@ const generateInvoicePrintPDF = (invoice, configData) => {
         fileName: `Invoice-${invoice.invoice}`,
         orientationLandscape: false,
         logo: {
-            src: configData.company_logo_url,
-            width: 53.33, //aspect ratio = width/height
+            src: logo,
+            width: 30.33, //aspect ratio = width/height
             height: 26.66,
             margin: {
                 top: 0, //negative or positive num, from the current position

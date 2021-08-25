@@ -107,7 +107,8 @@ class Employee(Base):
     purchase = relationship("Purchase",
                             back_populates="employee")
     client_document = relationship("ClientDocument",
-                                   back_populates="employee")
+                                   back_populates="employee")    
+
     event = relationship("Event", back_populates="employee")
 
 
@@ -128,25 +129,27 @@ class Cash(Base):
     __tablename__ = "app_cash"
 
     id = Column(Integer, primary_key=True, index=True)
-    fecha = Column(Date, index=True)
-    apertura = Column(DateTime)
-    cierre = Column(DateTime)
-    descripcion = Column(String(200))
-    monto_apertura = Column(Float, default=0.00)
-    monto_cierre = Column(Float, default=0.00)
+    date = Column(Date, index=True)
+    date_opened = Column(DateTime)
+    date_closed = Column(DateTime)
+    description = Column(String(200))
+    amount_open = Column(Float, default=0.00)
+    amount_close = Column(Float, default=0.00)
     status = Column(Integer, default=0)
     created_on = Column(DateTime, default=datetime.datetime.now())
+    user_id = Column(Integer, ForeignKey(
+        "auth_user.id"),  nullable=False)
 
     cash_detail = relationship("CashDetail", back_populates="cash")
-
+    user = relationship("User", back_populates="cash")
 
 class CashDetail(Base):
     __tablename__ = "app_cash_detail"
 
     id = Column(Integer, primary_key=True, index=True)
-    concepto = Column(String(100))
-    monto = Column(Float, default=0.00)
-    caja_id = Column(Integer, ForeignKey("app_cash.id"), nullable=False)
+    concept = Column(String(100))
+    amount = Column(Float, default=0.00)
+    cash_id = Column(Integer, ForeignKey("app_cash.id"), nullable=False)
 
     cash = relationship("Cash", back_populates="cash_detail")
 
@@ -343,6 +346,8 @@ class User(Base):
     is_active = Column(Integer, default=0)
     date_joined = Column(Date)
     permission = relationship("UserPermission", back_populates="user")
+    cash = relationship("Cash",
+                           back_populates="user") 
 
 
 class UserPermission(Base):

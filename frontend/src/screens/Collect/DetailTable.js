@@ -63,7 +63,7 @@ const DetailForm = (props) => {
 				getData(collectId)
 			})
 			.catch(e => {
-				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)
+				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText} - ${e.response.data.detail}`)
 			});
 	}
 
@@ -282,7 +282,7 @@ const DetailTable = (props) => {
 			.catch(e => {
 				// console.log(e)
 				if (e.response.status !== '404') {
-					openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)
+					openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText} - ${e.response.data.detail}`)
 					// setData(emptyData)
 				} else {
 					// setData(emptyData)
@@ -300,7 +300,7 @@ const DetailTable = (props) => {
 				getData(collectId)
 			})
 			.catch(e => {
-				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)
+				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText} - ${e.response.data.detail}`)
 			});
 	}
 

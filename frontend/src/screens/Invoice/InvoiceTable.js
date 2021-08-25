@@ -79,7 +79,7 @@ const InvoiceTable = (props) => {
         setData(response.data)        
       })
       .catch(e => {        
-        openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)
+        openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText} - ${e.response.data.detail}`)
       });
   }
 
@@ -91,7 +91,7 @@ const InvoiceTable = (props) => {
         retrieveData()
       })
       .catch(e => {
-        openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)
+        openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText} - ${e.response.data.detail}`)
       });
   }
 
@@ -114,7 +114,7 @@ const InvoiceTable = (props) => {
 			})
 			.catch(e => {
         console.log(e)
-				alert(`Error - Code: ${e.response.status} Message: ${e.response.statusText}`)
+				alert(`Error - Code: ${e.response.status} Message: ${e.response.statusText} - ${e.response.data.detail}`)
 			});
 	}
 

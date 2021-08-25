@@ -31,7 +31,13 @@ def create_collect_details(collect_detail: CollectDetailCreate,
                            db: Session = Depends(get_db),
                            current_user: User = Depends(
                                get_current_active_user)):
-    return create_collect_detail(db=db, collect_detail=collect_detail)
+
+    db_collect = create_collect_detail(db=db, collect_detail=collect_detail)
+    
+    if db_collect is None:
+        raise HTTPException(status_code=409, detail="Be sure there is only/at least one CASH opened")
+    
+    return db_collect
 
 # not sure if worht thinking about stock
 @router.patch("/api/collect-detail/",
@@ -55,7 +61,7 @@ def delete_collect_details(collect_detail: CollectDetailDelete,
                                get_current_active_user)):
     db_collect_detail = delete_collect_detail(db, collect_detail)
     if db_collect_detail is None:
-        raise HTTPException(status_code=404, detail="CollectDetail not found")
+        raise HTTPException(status_code=409, detail="Be sure there is only/at least one CASH opened")
     return db_collect_detail
 
 

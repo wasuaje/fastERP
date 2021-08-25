@@ -3,7 +3,8 @@ import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import CssBaseline from '@material-ui/core/CssBaseline';
-import Autocomplete from '@material-ui/lab/Autocomplete';
+import Checkbox from '@material-ui/core/Checkbox';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
@@ -40,101 +41,27 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const base_url = 'api'
-const endpoint = `${base_url}/collect`
-const invoiceEndpoint = `${base_url}/invoice/pending`
-const profesionalEndpoint = `${base_url}/profesional`
-const bankEndpoint = `${base_url}/bank`
-const paymentMethodEndpoint = `${base_url}/payment-method`	
+const endpoint = `${base_url}/cash`
 const DATE_FORMAT = 'yyyy-MM-dd';
 
-const CollectForm = React.forwardRef((props, ref) => {
+const CashForm = React.forwardRef((props, ref) => {
 	const { t } = useTranslation();
 	const { idToUpdate } = props;
-	const [collectId, setCollectId] = useState(props.idToUpdate)
+	const [cashId, setCashId] = useState(props.idToUpdate)
 	useEffect(() => {
 		let isActive = true;
 		return () => { isActive = false };
-	}, [collectId, setCollectId]);
-	const [selectedDate, setSelectedDate] = useState(new Date());	
-
-
-	const [bankData, setBankData] = useState([]);
-	useEffect(() => {
-
-		retrieveBankData()
-	}, []);
-
-	const retrieveBankData = () => {
-		DataService.getAll(bankEndpoint)
-			.then(response => {
-				setBankData(response.data)
-				// console.log("bank",response.data);
-			})
-			.catch(e => {
-				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText} - ${e.response.data.detail}`)
-			});
-	}
-
-	const [paymentMethodData, setPaymentMethodData] = useState([]);
-	useEffect(() => {
-
-		retrievePaymentMethodData()
-	}, []);
-
-	const retrievePaymentMethodData = () => {
-		DataService.getAll(paymentMethodEndpoint)
-			.then(response => {
-				setPaymentMethodData(response.data)
-				// console.log("paymentMethod",response.data);
-			})
-			.catch(e => {
-				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText} - ${e.response.data.detail}`)
-			});
-	}
-
-	// Getting Invoice data only once at the beggining
-	const [invoiceData, setInvoiceData] = useState([]);
-	useEffect(() => {
-
-		retrieveInvoiceData()
-	}, []); // Those ARE connectec
-
-	const retrieveInvoiceData = () => {
-		DataService.getAll(invoiceEndpoint)
-			.then(response => {
-				setInvoiceData(response.data)
-				// console.log(response.data);
-			})
-			.catch(e => {
-				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText} - ${e.response.data.detail}`)
-			});
-	}
-
-
-	const [descriptionValue,setDescriptionValue] = useState("")	
-
-	// Getting profesional data only once at the beggining
-	const [profesionalData, setProfesionalData] = useState([]);
-	useEffect(() => {
-
-		retrieveProfesionalData()
-	}, []); // Those ARE connectec
-
-	const retrieveProfesionalData = () => {
-		DataService.getAll(profesionalEndpoint)
-			.then(response => {
-				setProfesionalData(response.data)
-				// console.log(response.data);
-			})
-			.catch(e => {
-				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText} - ${e.response.data.detail}`)
-			});
-	}
-
-	//invoice combobox values
-	const [invoiceValue, setInvoiceValue] = React.useState(invoiceData[0]);
-	const [invoiceInputValue, setInvoiceInputValue] = React.useState('');	
-	const [totalValue, setTotalValue] = React.useState(0.00);
+	}, [cashId, setCashId]);
+	const [selectedDate, setSelectedDate] = useState(new Date());
+	const [dateOpenedValue, setDateOpenedValue] = useState("");
+	const [dateClosedValue, setDateClosedValue] = useState("");
+	const [amountOpenValue, setAmountOpenValue] = useState("");
+	const [amountCloseValue, setAmountCloseValue] = useState("");
+	const [descriptionValue, setDescriptionValue] = useState("");
+	const [isClosed, setIsClosed] = useState(false);
+	const handleChecked = (event) => {
+		setIsClosed(event.target.checked);
+	};
 
 	// INFO NOTIFICATION VARS
 	const [infoOpen, setInfoOpen] = useState(false);
@@ -176,7 +103,7 @@ const CollectForm = React.forwardRef((props, ref) => {
 	};
 	// *****************
 
-	
+
 	const [data, setData] = useState([]);
 	useEffect(() => {
 		let id = typeof idToUpdate === 'object' ? 0 : idToUpdate
@@ -187,12 +114,15 @@ const CollectForm = React.forwardRef((props, ref) => {
 		DataService.get(id, endpoint)
 			.then(response => {
 				// console.log("get data",response.data)		
-				setCollectId(response.data.id)
-				setTotalValue(response.data.total)		
-				setSelectedDate(parseISO(response.data.date))				
-				setInvoiceInputValue(response.data.invoice)
-				setInvoiceValue(response.data.invoice)				
-				setDescriptionValue(response.data.description)				
+				setCashId(response.data.id)
+				setSelectedDate(parseISO(response.data.date))
+				setAmountCloseValue(response.data.amount_close)
+				setAmountOpenValue(response.data.amount_open)
+				setDescriptionValue(response.data.description)
+				setDateClosedValue(parseISO(response.data.date_closed))
+				setDateOpenedValue(parseISO(response.data.date_opened))
+				setIsClosed(response.data.status == 1 ? true : false)						
+
 			})
 			.catch(e => {
 				console.log(e)
@@ -209,7 +139,7 @@ const CollectForm = React.forwardRef((props, ref) => {
 	const updateData = (values) => {
 		DataService.update(endpoint, values)
 			.then(response => {
-				openNoticeBox("Notice", t("record_updated_successfully", {"table": t("collect_table_title")}))
+				openNoticeBox("Notice", t("record_updated_successfully", { "table": t("cash_table_title") }))
 			})
 			.catch(e => {
 				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText} - ${e.response.data.detail}`)
@@ -219,8 +149,9 @@ const CollectForm = React.forwardRef((props, ref) => {
 	const addData = (values) => {
 		DataService.create(`${endpoint}/`, values)
 			.then(response => {
-				openNoticeBox("Notice", t("record_created_successfully", {"table": t("collect_table_title")}))
-				setCollectId(response.data.id)				
+				openNoticeBox("Notice", t("record_created_successfully", { "table": t("cash_table_title") }))
+				setCashId(response.data.id)
+
 			})
 			.catch(e => {
 				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText} - ${e.response.data.detail}`)
@@ -229,18 +160,21 @@ const CollectForm = React.forwardRef((props, ref) => {
 
 	const submitForm = (event) => {
 		event.preventDefault();
-		var newDate,newDueDate = ""
-		newDate = format(selectedDate, DATE_FORMAT)		
+		var newDate, newDueDate = ""
+		newDate = format(selectedDate, DATE_FORMAT)
+
 		let values = {
-			'invoice_id': invoiceValue.id,
-			'date': newDate,						
-			'description': descriptionValue			
+			'date': newDate,
+			'amount_open': amountOpenValue,
+			'description': descriptionValue,
+		}		
+		if (cashId === 0) {
+			addData(values)
 		}
-		if (collectId === 0) {
-			addData(values)			
-		}
-		if (collectId > 0) {
-			values.id = collectId
+		if (cashId > 0) {
+			values.id = cashId
+			values.status=isClosed
+			values.amount_close=amountCloseValue
 			// console.log(values)
 			updateData(values)
 		}
@@ -273,26 +207,8 @@ const CollectForm = React.forwardRef((props, ref) => {
 				<Grid container spacing={2}>
 					<Grid item xs={4}>
 						<Typography variant="h4" component="h4">
-							{t("collect_form_collect_id")}: {collectId ? collectId : 0}
+							{t("cash_form_cash_id")}: {cashId ? cashId : 0}
 						</Typography>
-						<Autocomplete
-							id="invoice"
-							// value={value}
-							options={invoiceData}
-							getOptionLabel={(option) => option.invoice ? option.invoice : "-"}
-							onChange={(event, newValue) => {								
-								setInvoiceValue(newValue);
-							}}
-							inputValue={invoiceInputValue}
-							onInputChange={(event, newInputValue) => {
-								setInvoiceInputValue(newInputValue);
-							}}
-
-							value={invoiceValue ? invoiceValue : ""}
-							renderInput={(params) => <TextField {...params} label={t("collect_form_lbl_collect_invoice")} variant="outlined" />}
-							getOptionSelected={(option, value) => option.value === value.value}
-							style={{ marginTop: '15px' }}
-						/>
 						<MuiPickersUtilsProvider utils={DateFnsUtils}>
 							<KeyboardDatePicker
 								clearable="true"
@@ -307,43 +223,89 @@ const CollectForm = React.forwardRef((props, ref) => {
 								variant="inline"
 								inputVariant="outlined"
 								style={{ marginTop: '5px' }}
-							/>							
-						</MuiPickersUtilsProvider>						
+							/>
+						</MuiPickersUtilsProvider>
+						<TextField
+							variant="outlined"
+							margin="normal"
+							fullWidth
+							id="amount_open"
+							label={t("cash_form_lbl_cash_amount_open")}
+							name="amount_open"
+							onChange={event => setAmountOpenValue(event.target.value)}
+							value={amountOpenValue}
+							style={{ marginTop: '5px' }}
+						/>
 						<TextField
 							variant="outlined"
 							margin="normal"
 							fullWidth
 							id="description"
-							label={t("collect_form_lbl_collect_description")}
+							label={t("cash_form_lbl_cash_description")}
 							name="description"
 							multiline
-          					maxRows={4}
+							maxRows={4}
 							onChange={event => setDescriptionValue(event.target.value)}
 							value={descriptionValue}
-							style={{ marginTop: '5px' }}
-						/>						
+							style={{ marginTop: '-2px' }}
+						/>
 						<TextField
 							variant="outlined"
 							margin="normal"
 							fullWidth
-							id="total"
-							label={t("collect_form_lbl_collect_total")}
-							name="total"
-							onChange={event => setTotalValue(event.target.value)}
-							value={totalValue}
+							id="date_opened"
+							label={t("cash_form_lbl_cash_date_opened")}
+							name="date_opened"
+							// onChange={event => setFootNoteValue(event.target.value)}
+							value={dateOpenedValue}
+							style={{ marginTop: '-2px' }}
 							disabled={true}
-							style={{ marginTop: '1px' }}
+						/>
+						<TextField
+							variant="outlined"
+							margin="normal"
+							fullWidth
+							id="amount_close"
+							label={t("cash_form_lbl_cash_amount_close")}
+							name="amount_close"
+							multiline
+							maxRows={4}
+							onChange={event => setAmountCloseValue(event.target.value)}
+							value={amountCloseValue}
+							style={{ marginTop: '5px' }}
+							disabled={cashId === 0 ? true : false}
+						/>
+						<TextField
+							variant="outlined"
+							margin="normal"
+							fullWidth
+							id="date_closed"
+							label={t("cash_form_lbl_cash_date_closed")}
+							name="date_closed"
+							// onChange={event => setFootNoteValue(event.target.value)}
+							value={dateClosedValue}
+							style={{ marginTop: '-2px' }}
+							disabled={true}
+						/>
+						<FormControlLabel
+							value={isClosed}
+							checked={isClosed}
+							control={<Checkbox color="primary" /> }
+							label={isClosed ? t("cash_form_lbl_invoice_is_closed"): t("cash_form_lbl_invoice_to_close")}
+							labelPlacement="end"
+							onChange={handleChecked}
+							name="is_closed"
+							disabled={cashId === 0 ? true: false}
 						/>
 					</Grid>
 					<Grid item xs={8}>
 						<DetailTable
-							collectId={collectId}
-							setCollectId={setCollectId}													
-							invoiceData={invoiceValue}
-							bankData={bankData}						
-							setBankData={setBankData}	
-							paymentMethodData={paymentMethodData}
-							setPaymentMethodData={setPaymentMethodData}
+							cashId={cashId}
+							setCashId={setCashId}
+							amountOpenValue={amountOpenValue}
+							amountCloseValue={amountCloseValue}
+							setAmountOpenValue={setAmountOpenValue}
+							setAmountCloseValue={setAmountCloseValue}
 						/>
 					</Grid>
 					<Grid item xs={12}>
@@ -354,7 +316,7 @@ const CollectForm = React.forwardRef((props, ref) => {
 							color="primary"
 							className={classes.submit}
 						>
-							{collectId === 0 ? t("save_form_button") : t("update_form_button")}
+							{cashId === 0 ? t("save_form_button") : t("update_form_button")}
 
 						</Button>
 					</Grid>
@@ -368,5 +330,5 @@ const CollectForm = React.forwardRef((props, ref) => {
 	)
 })
 
-export default CollectForm;
+export default CashForm;
     // ReactDOM.render(<WithMaterialUI />, document.getElementById('root'));

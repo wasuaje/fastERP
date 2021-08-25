@@ -1,8 +1,9 @@
 from sqlalchemy.orm import Session
 import sqlalchemy as sa
-from ..models import Collect as CollectModel, CollectDetail as CollectDetailModel
+from ..models import Collect as CollectModel, CollectDetail as CollectDetailModel, Cash
 from ..schemas.collect import CollectCreate, Collect, CollectDelete
 # from .collect_detail import update_collect as refresh_collect
+from .utils import get_open_cash
 
 # CASH
 def get_collect(db: Session, collect_id: int):
@@ -15,6 +16,11 @@ def get_collects(db: Session, skip: int = 0, limit: int = 100):
 
 
 def create_collect(db: Session, collect: CollectCreate):
+    cash: Cash = get_open_cash(db)
+    
+    if cash is None:        #There is no cash or more than one opened
+        return None
+    
     db_collect = CollectModel(date=collect.date,                              
                               description=collect.description,
                               invoice_id=collect.invoice_id                              

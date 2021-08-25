@@ -30,7 +30,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "extract-translations": "i18next --fail-on-warnings"
+    "extract-translations": "i18next --fail-on-warnings",
+    "diffTrans": "node src/translations/es/applydiff.js"
   },
   "eslintConfig": {
     "extends": [

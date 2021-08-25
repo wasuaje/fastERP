@@ -28,8 +28,10 @@ def list_collect(skip: int = 0, limit: int = 100,
 def create_a_collect(collect: CollectCreate,
                      db: Session = Depends(get_db),
                      current_user: User = Depends(get_current_active_user)):
-    return create_collect(db=db, collect=collect)
-
+    db_collect = create_collect(db=db, collect=collect)
+    if db_collect is None:
+        raise HTTPException(status_code=409, detail="Be sure there is only/at least one CASH opened")
+    return db_collect
 
 @router.get("/api/collect/{collect_id}", response_model=CollectResponse,
             tags=["Collect"])
@@ -62,5 +64,5 @@ def delete_a_collect(collect: CollectDelete,
                          get_current_active_user)):
     db_collect = delete_collect(db, collect)
     if db_collect is None:
-        raise HTTPException(status_code=404, detail="Collect not found")
+        raise HTTPException(status_code=409, detail="Be sure there is only/at least one CASH opened")
     return db_collect

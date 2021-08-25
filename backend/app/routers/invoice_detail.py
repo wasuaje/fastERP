@@ -14,7 +14,7 @@ router = APIRouter(dependencies=[Depends(get_current_active_user),
                                  Depends(get_user_permissions)])
 
 #
-# CAjaDetalle - InvoiceDetail
+# FacturaDetalle - InvoiceDetail
 #
 @router.get("/api/invoice-detail/", response_model=List[InvoiceDetailResponse],
             tags=["InvoiceDetail"])

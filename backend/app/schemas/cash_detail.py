@@ -23,26 +23,22 @@ class CashDetailDelete(BaseModel):
 
 
 class CashDetailBase(BaseModel):
-    concepto: str
-    monto: float
-    caja_id: int
+    concept: str
+    amount: float
+    cash_id: int
 
 
 class CashDetailCreate(CashDetailBase):
     class Config:
         orm_mode = True
-        schema_extra = {"concepto": "Entrada XXXX",
-                        "monto": 2515.12,
-                        "cash": 22
+        schema_extra = {"concept": "Entrada XXXX",
+                        "amount": 2515.12,
+                        "cash_id": 22
                         }
 
 
-class CashDetail(CashDetailBase):
+class CashDetailResponse(CashDetailBase):
     id: int
 
     class Config:
         orm_mode = True
-        schema_extra = {"concepto": "Entrada XXXX",
-                        "monto": 2515.12,
-                        "cash": 22
-                        }

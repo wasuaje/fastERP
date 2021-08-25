@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from app.schemas.client_document import ClientDocumentDelete
-from ..models import ClientDocument, ClientDocumentDetail, Configuration, DocumentType, Invoice, InvoiceDetail
+from ..models import CashDetail, ClientDocument, ClientDocumentDetail, Configuration
+from ..models import Cash, DocumentType, Invoice, InvoiceDetail
 from .invoice_detail import update_invoice, update_inventory
 
 
@@ -80,3 +81,22 @@ def invoice_document(db: Session, document_id):
     db.refresh(document_record)
 
     return new_invoice
+
+def get_open_cash(db: Session):
+    # Getting open cash
+    open_cash_record = db.query(Cash).filter(
+        Cash.status == 0).all()
+    if len(open_cash_record) > 1 or len(open_cash_record) == 0:
+        return None
+    else:
+        return open_cash_record[0]
+
+
+def add_automatic_collect(db: Session, concept, amount):
+    open_cash = get_open_cash(db)
+    cash_detail = CashDetail(concept=concept, amount=amount, cash_id=open_cash.id)    
+    db.add(cash_detail)
+    db.commit()
+
+
+
