@@ -1,38 +1,7 @@
 from sqlalchemy.orm import Session
 from ..models import PurchaseDetail as PurchaseDetailModel, Purchase, Product
 from ..schemas.purchase_detail import PurchaseDetail as PurchaseDetailSchema, PurchaseDetailDelete
-
-
-
-def update_purchase(db: Session, purchase_id):
-    purchase = db.query(Purchase).filter(
-        Purchase.id == purchase_id).first()
-    subtotal = 0.00
-    dct_total = 0.00
-    tax_total = 0.00
-    for detail in purchase.purchase_detail:
-        subtotal+=detail.total
-    dct_total = subtotal * (purchase.dct/100)
-    tax_total = (subtotal-dct_total) * (purchase.tax/100)
-    purchase.subtotal=subtotal        
-    purchase.total=subtotal-dct_total+tax_total
-    db.commit()    
-    db.refresh(purchase)
-
-
-def update_inventory_and_cost(db, product_id, qtty, price, operation):
-    product = db.query(Product).filter(
-        Product.id == product_id).first()
-    if operation == '+':
-        product.stock = product.stock + qtty
-        product.cost = price
-    elif operation == '-':
-        product.stock = product.stock - qtty
-    else:
-        pass    
-    db.commit()    
-    db.refresh(product)
-
+from .utils import update_inventory_and_cost, update_purchase
 
 def get_purchase_details(db: Session, skip: int = 0, limit: int = 100):
     return db.query(PurchaseDetailModel).offset(skip).limit(limit).all()

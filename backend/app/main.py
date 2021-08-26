@@ -15,7 +15,7 @@ from .routers import profesional, cash_detail, invoice, invoice_detail
 from .routers import product_category, provider, purchase, purchase_detail
 from .routers import permission, payment_method, configuration, collect
 from .routers import collect_detail, bank, document_type, client_document
-from .routers import client_document_detail
+from .routers import client_document_detail, inventory, inventory_detail
 from .dependencies import get_current_active_user, get_user_permissions
 # from fastapi_pagination import  add_pagination
 
@@ -63,6 +63,8 @@ app.include_router(collect_detail.router)
 app.include_router(bank.router)
 app.include_router(configuration.router)
 app.include_router(event.router)
+app.include_router(inventory.router)
+app.include_router(inventory_detail.router)
 app.include_router(auth.router)
 app.include_router(permission.router)
 

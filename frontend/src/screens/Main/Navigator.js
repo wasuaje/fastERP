@@ -24,7 +24,7 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import PhonelinkSetupIcon from '@material-ui/icons/PhonelinkSetup';
 import SupervisorAccountIcon from '@material-ui/icons/SupervisorAccount';
 import PostAddIcon from '@material-ui/icons/PostAdd';
-
+import AssessmentIcon from '@material-ui/icons/Assessment';
 import DataService from "../../services/data.service";
 
 import Authenticate from '../Authenticate/Authenticate';
@@ -39,6 +39,8 @@ import PaymentMethod from '../PaymentMethod/PaymentMethodTable';
 import CollectTable from '../Collect/CollectTable';
 import ClientDocumentTable from '../ClientDocument/ClientDocumentTable'
 import CashTable from '../Cash/CashTable';
+import InventoryTable from '../Inventory/InventoryTable';
+import ReportForm from '../../components/Report/ReportForm'
 import logo from '../../assets/img/logo.jpg'; // Tell webpack this JS file uses this image
 
 
@@ -258,7 +260,7 @@ function Navigator(props) {
           setContentComponent={setContentComponent}
           setheaderTitle={setheaderTitle}
           icon={<Shop />}
-          component={<PurchaseTable />}
+          component={<InventoryTable />}
           title={t("menu_inventory_move")}
           classes={classes}
         />        
@@ -278,6 +280,15 @@ function Navigator(props) {
           icon={<PostAddIcon />}
           component={<ProductTable />}
           title={t("menu_product")}
+          classes={classes}
+        />
+          <ChildItem
+          key="inventory_report"
+          setContentComponent={setContentComponent}
+          setheaderTitle={setheaderTitle}
+          icon={<AssessmentIcon />}
+          component={<ReportForm  reportGroup="inventory"/>}
+          title={t("menu_report")}
           classes={classes}
         />
         <Divider className={classes.divider} />

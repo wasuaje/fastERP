@@ -99,8 +99,6 @@ const generateInvoicePrintPDF = (order, configData) => {
     const pdfCreated = jsPDFInvoiceTemplate(props); //returns number of pages created
     var blob = pdfCreated.blob;
 
-    console.log(pdfCreated)
-    console.log(order)
     var pdfObject = pdfCreated.jsPDFDocObject;
 
 

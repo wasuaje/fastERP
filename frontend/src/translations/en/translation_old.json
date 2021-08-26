@@ -1,4 +1,20 @@
 {
   "goToDoc": "",
-  "website": ""
+  "website": "",
+  "cash_form_detail_lbl_product": "",
+  "cash_form_detail_lbl_qtty": "",
+  "cash_form_detail_lbl_price": "",
+  "cash_form_detail_lbl_total": "",
+  "cash_form_detail_product": "",
+  "cash_form_detail_qtty": "",
+  "cash_form_detail_price": "",
+  "cash_form_detail_total": "",
+  "inventory_form_detail_lbl_amount": "",
+  "inventory_form_detail_amount": "",
+  "inventory_form_lbl_inventory_amount_open": "",
+  "inventory_form_lbl_inventory_date_opened": "",
+  "inventory_form_lbl_inventory_amount_close": "",
+  "inventory_form_lbl_inventory_date_closed": "",
+  "inventory_form_lbl_invoice_is_closed": "",
+  "inventory_form_lbl_invoice_to_close": ""
 }

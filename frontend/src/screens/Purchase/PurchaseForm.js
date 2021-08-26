@@ -71,7 +71,7 @@ const PurchaseForm = React.forwardRef((props, ref) => {
 				// console.log(response.data);
 			})
 			.catch(e => {
-				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)
+				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText} - ${e.response.data.detail}`)
 			});
 	}
 
@@ -88,7 +88,7 @@ const PurchaseForm = React.forwardRef((props, ref) => {
 				// console.log("product",response.data);
 			})
 			.catch(e => {
-				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)
+				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText} - ${e.response.data.detail}`)
 			});
 	}
 
@@ -111,7 +111,7 @@ const PurchaseForm = React.forwardRef((props, ref) => {
 				// console.log(response.data);
 			})
 			.catch(e => {
-				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)
+				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText} - ${e.response.data.detail}`)
 			});
 	}
 
@@ -189,7 +189,7 @@ const PurchaseForm = React.forwardRef((props, ref) => {
 			.catch(e => {
 				console.log(e)
 				if (e.response.status !== 404) {
-					openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)					
+					openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText} - ${e.response.data.detail}`)					
 				} else {
 					// setData({})
 					console.log("Unexpected error: ", e)
@@ -204,7 +204,7 @@ const PurchaseForm = React.forwardRef((props, ref) => {
 				openNoticeBox("Notice", t("record_updated_successfully", {"table": t("purchase_table_title")}))
 			})
 			.catch(e => {
-				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)
+				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText} - ${e.response.data.detail}`)
 			});
 	}
 
@@ -215,7 +215,7 @@ const PurchaseForm = React.forwardRef((props, ref) => {
 				setPurchaseId(response.data.id)				
 			})
 			.catch(e => {
-				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)
+				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText} - ${e.response.data.detail}`)
 			});
 	}
 

@@ -80,6 +80,7 @@ class Product(Base):
 
     invoice_detail = relationship("InvoiceDetail", back_populates="product")
     purchase_detail = relationship("PurchaseDetail", back_populates="product")
+    inventory_detail = relationship("InventoryDetail", back_populates="product")
     client_document_detail = relationship(
         "ClientDocumentDetail", back_populates="product")
     category = relationship(
@@ -331,49 +332,6 @@ class Event(Base):
     employee = relationship("Employee", back_populates="event")
 
 
-class User(Base):
-    __tablename__ = "auth_user"
-
-    id = Column(Integer, primary_key=True, index=True)
-    password = Column(String(500))
-    last_login = Column(Date)
-    is_superuser = Column(Integer, default=0)
-    username = Column(String(20))
-    first_name = Column(String(50))
-    last_name = Column(String(50))
-    email = Column(String(100))
-    is_staff = Column(Integer, default=0)
-    is_active = Column(Integer, default=0)
-    date_joined = Column(Date)
-    permission = relationship("UserPermission", back_populates="user")
-    cash = relationship("Cash",
-                           back_populates="user") 
-
-
-class UserPermission(Base):
-    __tablename__ = "auth_user_permission"
-
-    id = Column(Integer, primary_key=True, index=True)
-    path = Column(String(200))
-    can_list = Column(Integer, default=0)
-    can_get = Column(Integer, default=0)        # get one
-    can_post = Column(Integer, default=0)
-    can_patch = Column(Integer, default=0)
-    can_delete = Column(Integer, default=0)
-    created_on = Column(DateTime, default=datetime.datetime.now())
-    user_id = Column(Integer, ForeignKey("auth_user.id"))
-    user = relationship("User", back_populates="permission")
-
-
-class Configuration(Base):
-    __tablename__ = "app_configuration"
-
-    id = Column(Integer, primary_key=True, index=True)
-    config_name = Column(String(50))
-    config_value = Column(String(500))
-    created_on = Column(DateTime, default=datetime.datetime.now())
-
-
 class DocumentType(Base):
     __tablename__ = "app_document_type"
 
@@ -431,3 +389,74 @@ class ClientDocumentDetail(Base):
     @hybrid_property
     def total(self):
         return self.qtty * self.price
+
+
+class Inventory(Base):
+    __tablename__ = "app_inventory"
+
+    id = Column(Integer, primary_key=True, index=True)
+    date = Column(Date, index=True)    
+    description = Column(String(200))    
+    status = Column(Integer, default=0)
+    created_on = Column(DateTime, default=datetime.datetime.now())    
+    user_id = Column(Integer, ForeignKey(
+        "auth_user.id"),  nullable=False)
+
+    inventory_detail = relationship("InventoryDetail", back_populates="inventory")
+    user = relationship("User", back_populates="inventory")
+
+
+class InventoryDetail(Base):
+    __tablename__ = "app_inventory_detail"
+
+    id = Column(Integer, primary_key=True, index=True)
+    qtty = Column(Integer, default=1)
+    product_id = Column(Integer, ForeignKey("app_product.id"),  nullable=False)
+    inventory_id = Column(Integer, ForeignKey("app_inventory.id"), nullable=False)
+
+    inventory = relationship("Inventory", back_populates="inventory_detail")
+    product = relationship("Product", back_populates="inventory_detail")
+
+
+class User(Base):
+    __tablename__ = "auth_user"
+
+    id = Column(Integer, primary_key=True, index=True)
+    password = Column(String(500))
+    last_login = Column(Date)
+    is_superuser = Column(Integer, default=0)
+    username = Column(String(20))
+    first_name = Column(String(50))
+    last_name = Column(String(50))
+    email = Column(String(100))
+    is_staff = Column(Integer, default=0)
+    is_active = Column(Integer, default=0)
+    date_joined = Column(Date)
+    permission = relationship("UserPermission", back_populates="user")
+    cash = relationship("Cash",
+                           back_populates="user") 
+    inventory = relationship("Inventory",
+                           back_populates="user") 
+
+class UserPermission(Base):
+    __tablename__ = "auth_user_permission"
+
+    id = Column(Integer, primary_key=True, index=True)
+    path = Column(String(200))
+    can_list = Column(Integer, default=0)
+    can_get = Column(Integer, default=0)        # get one
+    can_post = Column(Integer, default=0)
+    can_patch = Column(Integer, default=0)
+    can_delete = Column(Integer, default=0)
+    created_on = Column(DateTime, default=datetime.datetime.now())
+    user_id = Column(Integer, ForeignKey("auth_user.id"))
+    user = relationship("User", back_populates="permission")
+
+
+class Configuration(Base):
+    __tablename__ = "app_configuration"
+
+    id = Column(Integer, primary_key=True, index=True)
+    config_name = Column(String(50))
+    config_value = Column(String(500))
+    created_on = Column(DateTime, default=datetime.datetime.now())

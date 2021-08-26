@@ -46,7 +46,7 @@ def create_collect_detail(db: Session, collect_detail: CollectDetailSchema):
     db.commit()
     # update_invoice(db,collect_detail.invoice_id)
     update_collect(db, db_collect_detail.collect_id,db_collect_detail.amount,'+')
-    if db_collect_detail.payment_method.name == 'Efectivo':
+    if db_collect_detail.payment_method.name.lower() == 'efectivo':
         concept = f"Ingreso AUTO. FACT: {db_collect_detail.collect.invoice.invoice} - Cliente: {db_collect_detail.collect.invoice.client.name}"
         amount = db_collect_detail.amount
         add_automatic_collect(db, concept, amount)
@@ -78,7 +78,7 @@ def delete_collect_detail(db: Session, collect_detail: CollectDetailDelete):
     if collect_detail_data is None:
         return None
     else:
-        if collect_detail_data.payment_method.name == 'Efectivo':
+        if collect_detail_data.payment_method.name.lower() == 'efectivo':
             concept = f"Reverso AUTO. FACT: {collect_detail_data.collect.invoice.invoice} - Cliente: {collect_detail_data.collect.invoice.client.name}"
             amount = collect_detail_data.amount
             add_automatic_collect(db, concept, amount*-1)

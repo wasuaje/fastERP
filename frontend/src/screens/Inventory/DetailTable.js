@@ -37,55 +37,48 @@ const useStyles = makeStyles((theme) => ({
 
 
 const DetailForm = (props) => {
-	const base_url = 'api'	
+	const base_url = 'api'		
 	const getData = props.getData;
-	const { purchaseId, setPurchaseId, productData, setProductData } = props
-	const [qtty, setQtty] = useState(1)
-	const [price, setPrice] = useState(0.00)
-	const openNoticeBox = props.openNoticeBox
-	const { t } = useTranslation();
-
+	const { inventoryId, setInventoryId, productData, setProductData } = props
 	const [productValue, setProductValue] = React.useState("-");
-	const [productInputValue, setProductInputValue] = React.useState('');
+	const [productInputValue, setProductInputValue] = React.useState('');	
+	const [qtty, setQtty] = useState(1)
+	const openNoticeBox = props.openNoticeBox
+	const { t } = useTranslation();		
 
 
 	const addData = (values) => {
 		DataService.create(`${endpoint}/`, values)
 			.then(response => {
-				// openNoticeBox("Notice", "Purchase created successfully")   			
-				// setPurchaseId(response.data.id)
+				// openNoticeBox("Notice", "Inventory created successfully")   			
+				// setInventoryId(response.data.id)
 				// setData(emptyData)
-				getData(purchaseId)
+				getData(inventoryId)
 			})
 			.catch(e => {
-				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)
+				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText} - ${e.response.data.detail}`)
 			});
 	}
 
 	const AddDetail = (event) => {
 		event.preventDefault();
-		if (typeof productValue === 'undefined') {
-			openNoticeBox("Error",  t("should_pick_a_product"))
-			return false
-		}		
-		if ( qtty == 0 || price == 0) {
+		if ( qtty == 0 || productInputValue == "-") {
 			openNoticeBox("Error",  t("fill_all_fields_msg"))
 			return false
 		}
 		let values = {
-			'purchase_id': purchaseId,
-			'product_id': productValue.id,
+			'inventory_id': inventoryId,					
 			'qtty': qtty,
-			'price': price,
+			'product_id': productValue.id,
 		}
 		//  console.log(values)					
 		addData(values)
-		// if (purchaseId == 0) {
+		// if (inventoryId == 0) {
 		// 	addData(values)		
 		// 	// resetForm()		
 		// }
-		// if (purchaseId > 0 ) {			
-		// 	values.id = purchaseId
+		// if (inventoryId > 0 ) {			
+		// 	values.id = inventoryId
 		// 	// console.log(values)
 		// 	updateData(values)
 		// }
@@ -102,7 +95,7 @@ const DetailForm = (props) => {
 			</Grid>
 			<Grid item xs={2}>
 			</Grid>
-			<Grid item xs={2}>
+			<Grid item xs={4}>
 				<Autocomplete
 					id="product"
 					// value={value}
@@ -113,58 +106,32 @@ const DetailForm = (props) => {
 					}}
 					inputValue={productInputValue}
 					onInputChange={(event, newInputValue) => {
-						setProductInputValue(newInputValue);						
+						setProductInputValue(newInputValue);					
 					}}
 
 					value={productValue ? productValue : ""}
-					renderInput={(params) => <TextField {...params} label={t("purchase_form_detail_lbl_product")} />}
-					disabled={purchaseId === 0 ? true : false}
+					renderInput={(params) => <TextField {...params} label={t("invoice_form_detail_lbl_product")} />}
+					disabled={inventoryId === 0 ? true : false}
 					getOptionSelected={(option, value) => option.value === value.value}
 
 
 				/>
 			</Grid>
-			<Grid item xs={2}>
+			<Grid item xs={4}>
 				<TextField
 					margin="normal"
 					fullWidth
 					id="qtty"
-					label={t("purchase_form_detail_lbl_qtty")}
+					label={t("inventory_form_detail_lbl_qtty")}
 					name="qtty"
 					onChange={event => setQtty(event.target.value)}
-					value={qtty}
+					value={qtty ? qtty : 0}
 					style={{ marginTop: '-1px' }}
-					disabled={purchaseId === 0 ? true : false}
+					disabled={inventoryId === 0 ? true : false}
 				/>
-			</Grid>
+			</Grid>									
 			<Grid item xs={2}>
-				<TextField
-					margin="normal"
-					fullWidth
-					id="price"
-					label={t("purchase_form_detail_lbl_price")}
-					name="price"
-					onChange={event => setPrice(event.target.value)}
-					value={price ? price : 0}
-					style={{ marginTop: '-1px' }}
-					disabled={purchaseId === 0 ? true : false}
-				/>
-			</Grid>
-			<Grid item xs={2}>
-				<TextField
-					margin="normal"
-					fullWidth
-					id="total"
-					label={t("purchase_form_detail_lbl_total")}
-					name="total"
-					disabled
-					// onChange={event => { }}
-					value={price * qtty ? price * qtty : 0}
-					style={{ marginTop: '-1px' }}
-				/>
-			</Grid>
-			<Grid item xs={2}>
-				<Fab color="default" size="small" aria-label="add" onClick={AddDetail} style={{ marginTop: '-5px' }}  >
+				<Fab color="default" size="small" aria-label="add" onClick={AddDetail} style={{ marginTop: '-5px' }} disabled={inventoryId === 0 ? true : false} >
 					<AddIcon />
 				</Fab>
 			</Grid>
@@ -173,35 +140,36 @@ const DetailForm = (props) => {
 }
 
 const base_url = 'api'
-const endpoint = `${base_url}/purchase-detail`
-const purchaseEndpoint = `${base_url}/purchase`
+const endpoint = `${base_url}/inventory-detail`
+const inventoryEndpoint = `${base_url}/inventory`
 
 
 const DetailTable = (props) => {	
 	const { t } = useTranslation();
 
-	const { purchaseId, setPurchaseId, dctValue, taxValue, productData, setProductData } = props	
+	const { inventoryId, setInventoryId, productData, setProductData} = props	
 
 	const [detailSubTotal, setDetailSubTotal] = useState("0.00")
 
-	const [detailDctTotal, setDetailDctTotal] = useState("0.00")
-	useEffect(() => {
-		setDetailDctTotal(detailSubTotal*(dctValue/100))
-	}, [dctValue, detailSubTotal ]);
+	// const [detailDctTotal, setDetailDctTotal] = useState("0.00")
+	// useEffect(() => {
+	// 	setDetailDctTotal(amountOpenValue)
+	// }, [dctValue, detailSubTotal ]);
 
-	const [detailTaxTotal, setDetailTaxTotal] = useState("0.00")
-	useEffect(() => {
-		let tmpdct = detailSubTotal*(dctValue/100)
-		setDetailTaxTotal((detailSubTotal-tmpdct)*(taxValue/100))
-	}, [taxValue, detailSubTotal ]);
+	// const [detailTaxTotal, setDetailTaxTotal] = useState("0.00")
+	// useEffect(() => {
+	// 	let tmpdct = detailSubTotal*(dctValue/100)
+	// 	setDetailTaxTotal((detailSubTotal-tmpdct)*(taxValue/100))
+	// }, [taxValue, detailSubTotal ]);
 
 	const [detailTotal, setDetailTotal] = useState("0.00")							
 	useEffect(() => {
 		// console.log(detailSubTotal,detailDctTotal,detailTaxTotal)
-		let tmpdct = detailSubTotal*(dctValue/100)
-		let tmptax = (detailSubTotal-tmpdct)*(taxValue/100)
-		setDetailTotal(detailSubTotal-tmpdct+tmptax)
-	}, [taxValue, dctValue, detailSubTotal ]);
+		// let tmpdct = detailSubTotal*(dctValue/100)
+		// let tmptax = (detailSubTotal-tmpdct)*(taxValue/100)
+		setDetailTotal(detailSubTotal)
+		
+	}, [ detailSubTotal  ]);
 
 	const [showForm, setShowForm] = useState(false);
 
@@ -250,23 +218,23 @@ const DetailTable = (props) => {
 
 	const [detailData, setDetailData] = useState([]);
 	useEffect(() => {
-		getData(purchaseId)
+		getData(inventoryId)
 	}, []);
 
-	const getData = (id) => {
+	const getData = (id) => {		
 		DataService.get(id, endpoint)
 			.then(response => {
-				// console.log("get data", response.data)
+				//  console.log("get data", response.data)
 				setDetailData(response.data)				
 				var sumdetail = 0;
 				response.data.forEach(function (record) {
-					sumdetail += record.total;
+					sumdetail += record.amount;
 				});
 				setDetailSubTotal(sumdetail)				
 			})
 			.catch(e => {
 				if (e.response.status !== '404') {
-					openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)
+					openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText} - ${e.response.data.detail}`)
 					// setData(emptyData)
 				} else {
 					// setData(emptyData)
@@ -280,11 +248,11 @@ const DetailTable = (props) => {
 		var dataDelete = { 'id': id };
 		DataService.delete(endpoint, dataDelete)
 			.then(response => {
-				// openNoticeBox("Notice", "Purchase deleted successfully")   
-				getData(purchaseId)
+				// openNoticeBox("Notice", "Inventory deleted successfully")   
+				getData(inventoryId)
 			})
 			.catch(e => {
-				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText}`)
+				openNoticeBox("Error", `Code: ${e.response.status} Message: ${e.response.statusText} - ${e.response.data.detail}`)
 			});
 	}
 
@@ -307,10 +275,9 @@ const DetailTable = (props) => {
 				title="Detail"
 				columns={[
 					{ title: 'ID', field: 'id' },
-					{ title: t("purchase_form_detail_product"), field: 'product.name' },
-					{ title: t("purchase_form_detail_qtty"), field: 'qtty' },
-					{ title: t("purchase_form_detail_price"), field: 'price' },
-					{ title: t("purchase_form_detail_total"), field: 'total' }
+					{ title: t("invoice_form_detail_product"), field: 'product.name' },
+					{ title: t("inventory_form_detail_qtty"), field: 'qtty'}					
+					
 				]}
 				data={detailData}
 				actions={[
@@ -329,9 +296,9 @@ const DetailTable = (props) => {
 					Toolbar: props => (
 						<div style={{ backgroundColor: '#e8eaf5' }}>
 							<DetailForm
-								purchaseId={purchaseId}
+								inventoryId={inventoryId}
 								openNoticeBox={openNoticeBox}
-								getData={getData}
+								getData={getData}								
 								productData={productData}
 								setProductData={setProductData}
 							/>
@@ -340,18 +307,7 @@ const DetailTable = (props) => {
 				}}
 			/>
 			<div style={{ align: 'right', width: '500px', textAlignLast: 'right' }}>
-				<Typography variant="h6" component="h6">
-					Subtotal: {parseFloat(detailSubTotal).toFixed(2)}
-				</Typography>
-				<Typography variant="h6" component="h6">
-					Discount ({parseFloat(dctValue).toFixed(2)}): {parseFloat(detailDctTotal).toFixed(2)}
-				</Typography>
-				<Typography variant="h6" component="h6">
-					Tax ({parseFloat(taxValue).toFixed(2)}): {parseFloat(detailTaxTotal).toFixed(2)}
-				</Typography>
-				<Typography variant="h5" component="h5">
-					Total: {parseFloat(detailTotal).toFixed(2)}
-				</Typography>
+				
 			</div>
 		</Grid>
 	)

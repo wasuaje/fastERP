@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session
 from app.schemas.client_document import ClientDocumentDelete
 from ..models import CashDetail, ClientDocument, ClientDocumentDetail, Configuration
-from ..models import Cash, DocumentType, Invoice, InvoiceDetail
-from .invoice_detail import update_invoice, update_inventory
+from ..models import Cash, DocumentType, Invoice, InvoiceDetail, Product
+from ..models import Purchase
 
 
 def get_next_document_number(db: Session, doc_type_id):
@@ -100,3 +100,60 @@ def add_automatic_collect(db: Session, concept, amount):
 
 
 
+def update_invoice(db: Session, invoice_id):
+    invoice = db.query(Invoice).filter(
+        Invoice.id == invoice_id).first()
+    subtotal = 0.00
+    dct_total = 0.00
+    tax_total = 0.00
+    for detail in invoice.invoice_detail:
+        subtotal+=detail.total
+    dct_total = subtotal * (invoice.dct/100)
+    tax_total = (subtotal-dct_total) * (invoice.tax/100)
+    invoice.subtotal=subtotal        
+    invoice.total=subtotal-dct_total+tax_total
+    db.commit()    
+    db.refresh(invoice)
+
+
+def update_inventory(db: Session, product_id, qtty, operation):
+    product = db.query(Product).filter(
+        Product.id == product_id).first()
+    if operation == '+':
+        product.stock = product.stock + qtty
+    elif operation == '-':
+        product.stock = product.stock - qtty
+    else:
+        pass
+    db.commit()    
+    db.refresh(product)
+
+
+def update_purchase(db: Session, purchase_id):
+    purchase = db.query(Purchase).filter(
+        Purchase.id == purchase_id).first()
+    subtotal = 0.00
+    dct_total = 0.00
+    tax_total = 0.00
+    for detail in purchase.purchase_detail:
+        subtotal+=detail.total
+    dct_total = subtotal * (purchase.dct/100)
+    tax_total = (subtotal-dct_total) * (purchase.tax/100)
+    purchase.subtotal=subtotal        
+    purchase.total=subtotal-dct_total+tax_total
+    db.commit()    
+    db.refresh(purchase)
+
+
+def update_inventory_and_cost(db, product_id, qtty, price, operation):
+    product = db.query(Product).filter(
+        Product.id == product_id).first()
+    if operation == '+':
+        product.stock = product.stock + qtty
+        product.cost = price
+    elif operation == '-':
+        product.stock = product.stock - qtty
+    else:
+        pass    
+    db.commit()    
+    db.refresh(product)

@@ -2,36 +2,8 @@ from sqlalchemy.orm import Session
 from sqlalchemy.util.langhelpers import ellipses_string
 from ..models import InvoiceDetail as InvoiceDetailModel, Invoice, Product
 from ..schemas.invoice_detail import InvoiceDetail as InvoiceDetailSchema, InvoiceDetailDelete
+from .utils import update_invoice, update_inventory
 
-
-
-def update_invoice(db: Session, invoice_id):
-    invoice = db.query(Invoice).filter(
-        Invoice.id == invoice_id).first()
-    subtotal = 0.00
-    dct_total = 0.00
-    tax_total = 0.00
-    for detail in invoice.invoice_detail:
-        subtotal+=detail.total
-    dct_total = subtotal * (invoice.dct/100)
-    tax_total = (subtotal-dct_total) * (invoice.tax/100)
-    invoice.subtotal=subtotal        
-    invoice.total=subtotal-dct_total+tax_total
-    db.commit()    
-    db.refresh(invoice)
-
-
-def update_inventory(db, product_id, qtty, operation):
-    product = db.query(Product).filter(
-        Product.id == product_id).first()
-    if operation == '+':
-        product.stock = product.stock + qtty
-    elif operation == '-':
-        product.stock = product.stock - qtty
-    else:
-        pass
-    db.commit()    
-    db.refresh(product)
     
 
 def get_invoice_details(db: Session, skip: int = 0, limit: int = 100):

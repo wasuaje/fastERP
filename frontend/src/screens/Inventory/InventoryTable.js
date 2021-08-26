@@ -1,19 +1,25 @@
 import React, { useEffect, useState, useRef } from 'react';
 import MaterialTable from 'material-table';
+import { makeStyles } from '@material-ui/core/styles';
 import Fab from '@material-ui/core/Fab';
+import Grid from '@material-ui/core/Grid';
 import AddIcon from '@material-ui/icons/Add';
+import LockIcon from '@material-ui/icons/Lock';
+import LockOpenIcon from '@material-ui/icons/LockOpen';
 import Modal from '@material-ui/core/Modal';
-import PurchaseForm from './PurchaseForm';
+import InventoryForm from './InventoryForm';
 import GenericDialogBox from '../../components/GenericDialogBox';
 import InfoBox from '../../components/InfoBox';
 import DataService from "../../services/data.service";
 import PatchedPagination from '../../components/PatchedPagination'
 import { useTranslation } from "react-i18next";
 import { parseISO, format } from 'date-fns';
+import InventoryPrint from '../../components/Inventory/InventoryPrint';
 
-const classes = (theme) => ({
-  paper: {
-    maxWidth: 936,
+
+
+const useStyles = makeStyles((theme)  => ({
+  paper: {    
     margin: 'auto',
     overflow: 'hidden',
   },
@@ -21,7 +27,7 @@ const classes = (theme) => ({
     borderBottom: '1px solid rgba(0, 0, 0, 0.12)',
   },
   searchInput: {
-    fontSize: theme.graphy.fontSize,
+    fontSize: theme.fontSize,
   },
   block: {
     display: 'block',
@@ -33,14 +39,14 @@ const classes = (theme) => ({
     margin: '40px 16px',
   },
   fab: {
-    bottom: '50px',
+
     position: 'fixed',
     marginTop: '10px'
   }
-});
+}));
 
 
-const PurchaseModal = React.forwardRef((props, ref) => {
+const InventoryModal = React.forwardRef((props, ref) => {
   const { handleFormCLose, showForm, idToUpdate } = props;
 
   return (
@@ -49,7 +55,7 @@ const PurchaseModal = React.forwardRef((props, ref) => {
       onClose={handleFormCLose}
       aria-labelledby="simple-modal-title"
       aria-describedby="simple-modal-description">
-      <PurchaseForm idToUpdate={idToUpdate} />      
+      <InventoryForm idToUpdate={idToUpdate} />      
     </Modal>
   )
 })
@@ -57,10 +63,11 @@ const PurchaseModal = React.forwardRef((props, ref) => {
 
 const baseURL = process.env.REACT_APP_PUBLIC_API_URL
 const base_url = 'api'
-const endpoint = `${base_url}/purchase/`
-const endpointPaginated = `${baseURL}/api/purchase/`
+const endpoint = `${base_url}/inventory/`
+const endpointPaginated = `${baseURL}/api/inventory/`
+const configEndpoint = `${base_url}/configuration`
 
-const PurchaseTable = (props) => {
+const InventoryTable = (props) => {
   const { t } = useTranslation();
 
   const [data, setData] = useState([]);
@@ -72,7 +79,7 @@ const PurchaseTable = (props) => {
 
   const retrieveData = () => {
     DataService.getAll(endpoint)
-      .then(response => {        
+      .then(response => {                       
         setData(response.data)        
       })
       .catch(e => {        
@@ -92,6 +99,28 @@ const PurchaseTable = (props) => {
       });
   }
 
+	const [configData, setConfigData] = useState({});
+	useEffect(() => {
+
+		retrieveConfigData()
+	}, []); 
+
+	const retrieveConfigData = () => {
+		DataService.getAll(configEndpoint)
+			.then(response => {
+        let configTemp = {};
+        response.data.forEach(cfg => {
+          configTemp[cfg.config_name] = cfg.config_value          
+        });
+
+				setConfigData(configTemp)
+				// console.log(configTemp);      
+			})
+			.catch(e => {
+        console.log(e)
+				alert(`Error - Code: ${e.response.status} Message: ${e.response.statusText} - ${e.response.data.detail}`)
+			});
+	}
 
   // INFO NOTIFICATION VARS
   const [infoOpen, setInfoOpen] = useState(false);
@@ -110,7 +139,7 @@ const PurchaseTable = (props) => {
   const [printDialogOpen, setPrintDialogOpen] = useState(false);
   const [printDialogueTitle, setPrintDialogueTitle] = useState('');
   const [printDialogueBody, setPrintDialogueBody] = useState('');
-  const [purchaseObj, setPurchaseObj] = useState({});
+  const [inventoryObj, setInventoryObj] = useState({});
   // ************
 
   // FORM VARS
@@ -169,11 +198,13 @@ const PurchaseTable = (props) => {
     setDialogOpen(true)
   };
 
+	const classes = useStyles();
 
   const tableRef = React.createRef();
 
-  return (
-    <div >
+  return (    
+      <Grid container spacing={2} >
+      <Grid item xs={12}>
       <GenericDialogBox
         opn={dialogOpen}
         handleDialogOk={handleDialogOk}
@@ -186,41 +217,37 @@ const PurchaseTable = (props) => {
         title={infoTitle}
         body={infoBody} />
 
-      <PurchaseModal handleFormCLose={handleFormCLose} showForm={showForm} idToUpdate={idToUpdate} />      
+      <InventoryModal handleFormCLose={handleFormCLose} showForm={showForm} idToUpdate={idToUpdate} />      
 
       <MaterialTable
-        title={t("purchase_table_title")}
+        title={t("inventory_table_title")}
         tableRef={tableRef}
         columns={[
           { title: 'ID', field: 'id' },
           { title: t("form_table_column_date"), field: 'date' , render: rowData => format(parseISO(rowData.date), 'dd/MM/yyyy') },
-          { title: t("form_table_column_purchase"), field: 'invoice' },
-          { title: t("form_table_column_due_date"), field: 'due_date' , render: rowData => format(parseISO(rowData.due_date), 'dd/MM/yyyy') },
-          { title: t("form_table_column_client"), field: 'provider.name' },
-          { title: t("form_table_column_subtotal"), field: 'subtotal', render: rowData => rowData.subtotal.toFixed(2) },
-          { title: t("form_table_column_discount"), field: 'dct' , render: rowData => rowData.dct.toFixed(2)},
-          { title: t("form_table_column_tax"), field: 'tax' , render: rowData => rowData.tax.toFixed(2)},
-          { title: t("form_table_column_total"), field: 'total' , render: rowData => rowData.total.toFixed(2)},
-          { title: t("form_table_column_payed"), field: 'collected' , render: rowData => rowData.collected ? 'Yes' : 'No'}
+          { title: t("form_table_column_description"), field: 'description' },
+          { title: t("form_table_column_user"), field: 'user.username' },
+          { title: t("form_table_column_status"), field: 'status' , render: rowData => rowData.status == "1" ? <LockIcon /> : <LockOpenIcon />},          
         ]}
         
         data={data}
         actions={[
-          {
+          rowData => ({
             icon: 'edit',
             tooltip: t("detail_edit_record_tip"),
-            onClick: (event, rowData) => handleFormOpen(rowData.id)
-          },
-          {
+            onClick: (event, rowData) => handleFormOpen(rowData.id),
+            disabled:  rowData.status == "1" 
+          }),
+          rowData => ({
             icon: 'delete',
             tooltip: t("detail_delete_record_tip"),
-            onClick: (event, rowData) => openDialogBox(rowData.id)
-          },
+            onClick: (event, rowData) => openDialogBox(rowData.id),
+            disabled:  rowData.status == "1" 
+          }),
           {
             icon: 'print',
             tooltip: t("detail_print_record_tip"),
-            onClick: (event, rowData) => {}
-            // onClick: (event, rowData) => PurchaseReport(rowData)
+            onClick: (event, rowData) => InventoryPrint(rowData, configData), 
           }
           //add collect button
         ]}
@@ -237,8 +264,9 @@ const PurchaseTable = (props) => {
       <Fab color="primary" aria-label="add" className={classes.fab} onClick={handleFormOpen} style={{ marginTop: '10px' }}  >
         <AddIcon />
       </Fab>
-    </div>
+       </Grid>
+      </Grid>        
   )
 }
 
-export default PurchaseTable;
+export default InventoryTable;

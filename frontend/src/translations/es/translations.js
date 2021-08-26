@@ -189,5 +189,13 @@ export const TRANSLATIONS_ES = {
     cash_form_lbl_cash_date_closed: "Fecha Cierre",
     cash_form_lbl_invoice_is_closed: "Cerrada",
     cash_form_lbl_invoice_to_close: "Cerrar?",
-    form_table_column_user:"Usuario"
+    form_table_column_user:"Usuario",
+    inventory_form_lbl_inventory_description: "Desccripcion",        
+    inventory_table_title: "Inventario",
+    inventory_form_inventory_id: "Inventario ID",
+    inventory_form_detail_lbl_qtty: "Cant-",
+    inventory_form_detail_lbl_concept: "Concep.",
+    inventory_form_detail_qtty: "Cant.",
+    inventory_form_detail_concept: "Concep.",
+  
 };

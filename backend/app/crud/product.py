@@ -8,6 +8,11 @@ def get_products(db: Session, skip: int = 0, limit: int = 100):
     return db.query(ProductModel).offset(skip).limit(limit).all()
 
 
+def get_products_with_existence(db: Session, skip: int = 0, limit: int = 100):
+    data =  db.query(ProductModel).filter(ProductModel.stock > 0).all()    
+    return data
+
+
 def get_product(db: Session, product_id: int):
     return db.query(ProductModel).filter(
         ProductModel.id == product_id).first()
