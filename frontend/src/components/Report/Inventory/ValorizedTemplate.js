@@ -80,7 +80,7 @@ export { OutputType, jsPDF };
  *   pageEnable?: boolean,
  *   pageLabel?: string, } } props
  */
-function jsPDFInventoryTemplate(props) {
+function jsPDFValorizedTemplate(props) {
     const param = {
         outputType: props.outputType || "save",
         returnJsPDFDocObject: props.returnJsPDFDocObject || false,
@@ -492,7 +492,7 @@ function jsPDFInventoryTemplate(props) {
 
     //     doc.text("Faleminderit!", 10, currentHeight);
     doc.text(docWidth / 1.5, currentHeight, param.invoice.invTotalLabel, "right");
-    doc.text(docWidth - 20, currentHeight, param.invoice.InvTotalCost, "right");
+    doc.text(docWidth - 38, currentHeight, param.invoice.InvTotalCost, "right");
     doc.text(docWidth - 15, currentHeight, param.invoice.InvTotalPrice, "right");
     doc.text(docWidth - 10, currentHeight, param.invoice.invCurrency, "right");
 
@@ -611,4 +611,4 @@ function jsPDFInventoryTemplate(props) {
     return returnObj;
 }
 
-export default jsPDFInventoryTemplate;
+export default jsPDFValorizedTemplate;

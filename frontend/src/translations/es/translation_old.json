@@ -8,5 +8,7 @@
   "inventory_form_lbl_inventory_amount_close": "",
   "inventory_form_lbl_inventory_date_closed": "",
   "inventory_form_lbl_invoice_is_closed": "",
-  "inventory_form_lbl_invoice_to_close": ""
+  "inventory_form_lbl_invoice_to_close": "",
+  "inventory_form_detail_lbl_concept": "",
+  "inventory_form_detail_concept": ""
 }

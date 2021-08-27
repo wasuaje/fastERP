@@ -1,5 +1,5 @@
 
-import jsPDFInventoryTemplate, { OutputType } from "./ValorizedTemplate";
+import jsPDFValorizedTemplate, { OutputType } from "./ValorizedTemplate";
 
 // Date Fns is used to format the dates we receive
 // from our API call
@@ -36,7 +36,7 @@ const generateValorizedPrintPDF = (inventory, configData) => {
     var props = {
         outputType: 'blob',
         returnJsPDFDocObject: true,
-        fileName: `Inventory-report-valorized`,
+        fileName: `Inventory-report-valorized-${new Date()}`,
         orientationLandscape: false,
         logo: {
             src: logo,
@@ -61,10 +61,10 @@ const generateValorizedPrintPDF = (inventory, configData) => {
             tableBodyBorder: true,
             header: ["#", "Codigo", "Producto", "Formato", "Existencia", "Costo", "Precio"],
             table: arrLines,
-            invTotalLabel: "Total Movimientos:",
+            invTotalLabel: "Total Valor Inventario:",
             invTotal: 0,
-            InvTotalCost: parseFloat(totalCost),
-            InvTotalPrice: parseFloat(totalPrice),
+            InvTotalCost: parseFloat(totalCost).toFixed(2).toString(),
+            InvTotalPrice: parseFloat(totalPrice).toFixed(2).toString(),
             invCurrency: "$",
             row1: {
                 
@@ -84,7 +84,7 @@ const generateValorizedPrintPDF = (inventory, configData) => {
         pageEnable: true,
         pageLabel: "Page ",
     };
-    const pdfCreated = jsPDFInventoryTemplate(props); //returns number of pages created
+    const pdfCreated = jsPDFValorizedTemplate(props); //returns number of pages created
     var blob = pdfCreated.blob;
 
     var pdfObject = pdfCreated.jsPDFDocObject;

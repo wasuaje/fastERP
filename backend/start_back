@@ -10,5 +10,5 @@ do
    echo "waiting for mysql to continue..."
 done
 echo "copying data"
-
+mysql --host=mysql-server --user=${mysql_user} --password=${mysql_pass} mydb  < backend/initial_value.sql
 uvicorn backend.app.main:app --host 0.0.0.0 --port 8000

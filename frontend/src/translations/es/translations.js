@@ -197,5 +197,13 @@ export const TRANSLATIONS_ES = {
     inventory_form_detail_lbl_concept: "Concep.",
     inventory_form_detail_qtty: "Cant.",
     inventory_form_detail_concept: "Concep.",
+    report_inventory_valorized_title: "Inventario Valorizado",
+    report_inventory_valorized_title2: "Inventario Valorizado2",
+    report_form_detail_lbl_selected_report: "Reporte seleccionado",
+    report_form_lbl_date_from: "Fecha desde",
+    report_form_lbl_date_to: "Fechas hasta",
+    report_form_lbl_from_data: "Valor desde",
+    report_form_lbl_to_data: "Valor Hasta",
+    send_form_button: "Enviar",
   
 };
